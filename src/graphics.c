@@ -49,3 +49,18 @@ void draw_board(WINDOW *win, int *mailbox) {
     }
     wrefresh(win);
 };
+
+static char splash_message[] = ">Press Any Key to Continue<";
+
+void draw_splash_screen(WINDOW * win){
+    for(int i = 0; i < splash_screen_art_length; i++){
+        mvwprintw(win, i, splash_screen_hpad, "%s", splash_screen_art[i]);
+    }
+    struct timespec remaining, request = {0, 50000000L}; ;
+    wmove(win, 20, splash_screen_hpad + 14);
+    for(int i = 0; i < 27; i++){
+        nanosleep(&request, &remaining);
+        waddch(win, splash_message[i]);
+        wrefresh(win);
+    }
+}

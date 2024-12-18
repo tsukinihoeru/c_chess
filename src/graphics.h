@@ -1,5 +1,6 @@
 #include <ncurses.h>
 #include <wchar.h>
+#include <time.h>
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
@@ -59,6 +60,31 @@ static const char piece_art[6][6][15] = {
         "    |__|     ",
         "  (______)   "
     }
+};
+
+void draw_splash_screen(WINDOW * win);
+
+static const int splash_screen_hpad = 20;
+
+static const char splash_screen_art_length = 17;
+static const char splash_screen_art[17][55] = {
+    "      # ###      /                                    ",
+    "    /  /###  / #/                                     ",
+    "   /  /  ###/  ##                                     ",
+    "  /  ##   ##   ##                                     ",
+    " /  ###        ##                                     ",
+    "##   ##        ##  /##      /##       /###     /###   ",
+    "##   ##        ## / ###    / ###     / #### / / #### /",
+    "##   ##        ##/   ###  /   ###   ##  ###/ ##  ###/ ",
+    "##   ##        ##     ## ##    ### ####     ####      ",
+    "##   ##        ##     ## ########    ###      ###     ",
+    "##  ##         ##     ## #######       ###      ###   ",
+    " ## #       /  ##     ## ##              ###      ### ",    
+    "  ###      /   ##     ## ####    /  /###  ## /###  ## ",
+    "   ######/     ##     ##  ######/  / #### / / #### /  ",
+    "     ###       ###    ##   #####      ###/     ###/   ",
+    "                     /                                ",
+    "                    /                                 "
 };
 
 #endif
