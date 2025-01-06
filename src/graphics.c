@@ -29,8 +29,6 @@ void init_colors() {
     init_pair(BLACK_PIECE_HIGHLIGHT_SQUARE_C, BLACK_PIECE_COLOR, HIGHLIGHT_SQUARE_COLOR);
 }
 
-char pp_arr[16] = {'0', '1', '2', '3', 'P', 'p', 'N', 'n', 'B', 'b', 'R', 'r', 'Q', 'q', 'K', 'k'};
-
 static int get_square_color(int piece, int i, int j) {
     if (piece & 1) {
         if(i * 8 + j == highlighted_square)
@@ -73,7 +71,7 @@ void draw_board(WINDOW *win, int *mailbox) {
     wrefresh(win);
 };
 
-static char splash_message[] = ">Press Any Key to Continue<";
+static const char splash_message[] = ">Press Any Key to Continue<";
 
 void draw_splash_screen(WINDOW * win){
     for(int i = 0; i < splash_screen_art_length; i++){

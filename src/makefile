@@ -1,14 +1,23 @@
 CC = gcc
 CFLAGS = -Wall -Wextra
 LDLIBS = -lncurses
-objects = main.o bitboard.o graphics.o
+objects = graphics.o main.o
+subdir_objects = move_gen/bitboard_util.o move_gen/bitboard.o
+SUBDIRS = move_gen
 
 all : $(objects)
-	$(CC) -o out $(objects) $(LDLIBS)
+	@for subdir in $(SUBDIRS); do \
+        echo "Making all in $$subdir"; \
+        cd $$subdir && $(MAKE) all; \
+    done
+	$(CC) -o out $(objects) $(subdir_objects) $(LDLIBS)
 
-bitboard.o : bitboard.h
-main.o : bitboard.h graphics.h
 graphics.o : graphics.h
+main.o : move_gen/bitboard.h graphics.h
 
 clean :
-	rm out $(objects)
+	rm $(objects)
+	@for subdir in $(SUBDIRS); do \
+        echo "Cleaning all in $$subdir"; \
+        cd $$subdir && $(MAKE) clean; \
+    done

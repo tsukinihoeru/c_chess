@@ -1,5 +1,19 @@
 #include "bitboard.h"
 
+const int BB_SIZE = 8;
+const int NUM_SQUARES = 64;
+const int WHITE = 0;
+const int BLACK = 1;
+const int PAWN_BOARD = 2;
+const int KNIGHT_BOARD = 3;
+const int BISHOP_BOARD = 4;
+const int ROOK_BOARD = 5;
+const int QUEEN_BOARD = 6;
+const int KING_BOARD = 7;
+
+const int QUIET_FLAG = 0;
+const int CAPTURE_FLAG = 4;
+
 void clear_board(Board *board) {
     for (int i = 0; i < BB_SIZE; i++) {
         board->bitboards[i] = 0;
@@ -8,6 +22,7 @@ void clear_board(Board *board) {
         board->mailbox[i] = 0;
     }
 }
+
 
 //small helper function for parse_board
 int fen_char_to_piece(char c){
@@ -55,28 +70,29 @@ void parse_board(Board *board, char *fen) {
             int piece = fen_char_to_piece(*fen);
             add_piece(board, piece, rank * 8 + file);
             file++;
+        }else if(*fen == 'w'){
+            board->side_to_move = WHITE;
+        }else if(*fen == 'b'){
+            board->side_to_move = BLACK;
         }
         fen++;
     }
 }
 
-void add_piece(Board *board, int piece, int square){
-    board->bitboards[piece & 1] |= occupy_square[square];
-    board->bitboards[piece >> 1] |= occupy_square[square];
-    board->mailbox[square] = piece;
-}
+const char square[64][3] = {
+    "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1",
+    "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2",
+    "a3", "b3", "c3", "d3", "e3", "f3", "g3", "h3",
+    "a4", "b4", "c4", "d4", "e4", "f4", "g4", "h4",
+    "a5", "b5", "c5", "d5", "e5", "f5", "g5", "h5",
+    "a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6",
+    "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
+    "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8",
+};
 
-char print_piece_arr[16] = {'0', '1', '2', '3', 'P', 'p', 'N', 'n', 'B', 'b', 'R', 'r', 'Q', 'q', 'K', 'k'};
-
-void print_board(Board *board){
-    for(int i = 7; i >= 0; i--){
-        for(int j = 0; j < 8; j++){
-            int piece = board->mailbox[i * 8 + j];
-            if(piece){
-                printf("%c", print_piece_arr[piece]);
-            }else{
-                printf(".");
-            }
-        }printf("\n");
-    }
+void print_move(uint16_t move){
+    int source = (move >> 10) & 0x3f;
+    int dest = (move >> 4) & 0x3f;
+    int flag = move & 0x0f;
+    printf("%s%s%d", square[source], square[dest], flag);
 }

@@ -1,13 +1,15 @@
-#include "bitboard.h"
+#include "move_gen/bitboard.h"
 #include "graphics.h"
 
 int main() {
+
+    
     WINDOW *board_win;
     Board board;
     MEVENT event;
     int c;
     // char str [80];
-    char fen[] = "rnb1k2r/1pq1bppp/5n2/pPp1p3/2Pp4/3PPNP1/PB3P1P/RN1QKB1R w KQkq - 1 9";
+    char fen[] = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     parse_board(&board, fen);
     init_graphics();
     
