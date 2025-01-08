@@ -12,7 +12,16 @@ const int QUEEN_BOARD = 6;
 const int KING_BOARD = 7;
 
 const int QUIET_FLAG = 0;
+const int DOUBLE_PUSH_FLAG = 1;
 const int CAPTURE_FLAG = 4;
+const int KNIGHT_PROMO_FLAG = 8;
+const int BISHOP_PROMO_FLAG = 9;
+const int ROOK_PROMO_FLAG = 10;
+const int QUEEN_PROMO_FLAG = 11;
+const int KNIGHT_PROMO_CAP_FLAG = 12;
+const int BISHOP_PROMO_CAP_FLAG = 13;
+const int ROOK_PROMO_CAP_FLAG = 14;
+const int QUEEN_PROMO_CAP_FLAG = 15;
 
 void clear_board(Board *board) {
     for (int i = 0; i < BB_SIZE; i++) {
@@ -22,7 +31,6 @@ void clear_board(Board *board) {
         board->mailbox[i] = 0;
     }
 }
-
 
 //small helper function for parse_board
 int fen_char_to_piece(char c){
@@ -65,7 +73,7 @@ void parse_board(Board *board, char *fen) {
             rank--;
             file = 0;
         }else if(*fen > '0' && *fen < '9') { 
-            file += *fen -'0';
+            file += *fen - '0';
         }else if(!((rank * 16 + file) & 0x88)){
             int piece = fen_char_to_piece(*fen);
             add_piece(board, piece, rank * 8 + file);
@@ -95,4 +103,26 @@ void print_move(uint16_t move){
     int dest = (move >> 4) & 0x3f;
     int flag = move & 0x0f;
     printf("%s%s%d", square[source], square[dest], flag);
+}
+
+void print_board(Board *board){
+    for(int k = 0; k < 8; k++){
+        print_u64(board->bitboards[k]);
+        printf("\n");
+    }
+}
+
+void print_u64(uint64_t board){
+    for(int i = 7; i >= 0; i--){
+        for(int j = 0; j < 8; j++){
+            uint64_t index = 8 * i + j;
+            uint64_t res = 1;
+            res = res << index;
+            if(res & board){
+                printf("1");
+            }else{
+                printf("0");
+            }printf(" ");
+        }printf("\n");
+    }
 }

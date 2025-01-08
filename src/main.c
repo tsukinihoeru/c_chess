@@ -2,8 +2,22 @@
 #include "graphics.h"
 
 int main() {
-
     
+    Board board;
+    char fen[] = "7Q/4p3/3p2Q1/8/7P/6P1/8/1b6 w - - 0 1";
+    parse_board(&board, fen);
+    init_magics();
+    uint16_t move_list[218];
+    print_board(&board);
+    int num_moves = generate_moves(&board, move_list);
+    for(int i = 0; i < num_moves; i++){
+        print_move(move_list[i]);
+        printf("\n");
+    }
+    return 0;
+}
+
+/*
     WINDOW *board_win;
     Board board;
     MEVENT event;
@@ -47,6 +61,4 @@ int main() {
         }
     }
     endwin();
-
-    return 0;
-}
+*/
