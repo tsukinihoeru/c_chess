@@ -4,7 +4,7 @@
 int main() {
     
     Board board;
-    char fen[] = "7Q/4p3/3p2Q1/8/7P/6P1/8/1b6 w - - 0 1";
+    char fen[] = "r3knnr/pppbqppp/n3pn2/3p4/1bPP1B1P/2N2NP1/PP2PPB1/R2Q1RK1 b kq - 0 9";
     parse_board(&board, fen);
     init_magics();
     uint16_t move_list[218];

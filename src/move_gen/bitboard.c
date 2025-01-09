@@ -53,6 +53,12 @@ const uint64_t non_promotion_mask[2] = {0x00ffffffffffffff, 0xffffffffffffff00};
 uint64_t *rook_magic_ptrs[64];
 uint64_t *bishop_magic_ptrs[64];
 uint64_t *attack_table;
+const int check_ks_castling[2] = {8, 2};
+const uint64_t ks_castling_occupy[2] = {0x60, 0x6000000000000000};
+const uint64_t qs_castling_occupy[2] = {0xe, 0xe00000000000000};
+const int check_qs_castling[2] = {4, 1};
+const uint16_t ks_castle_move [2] = {4194, 62434};
+const uint16_t qs_castle_move [2] = {4131, 62371};
 
 int generate_moves(Board *board, uint16_t * move_list){
     uint16_t * og_list = move_list;
@@ -65,6 +71,12 @@ int generate_moves(Board *board, uint16_t * move_list){
     //pawn moves, if branch mispredictions happen often, program can be sped up by branchless programming
     //have an array store both results of shiftupone and shiftdownone, then use board->side to move as index
     b1 = board->bitboards[PAWN_BOARD] & us;
+    //en passant first
+    b2 = b1 & en_passant_lookup[board->history[board->ply].en_passant_square];
+    while(b2){
+        int source = pop_lsb(&b2);
+        *move_list++ = (source << 10) | ((board->history[board->ply].en_passant_square - undo_single_push[board->side_to_move]) << 4) | EN_PASSANT_FLAG;
+    }
     b2 = board->side_to_move ? shift_left_down_one(b1) : shift_left_up_one(b1);
     b2 &= them;
     b3 = b2 & non_promotion_mask[board->side_to_move];
@@ -119,17 +131,20 @@ int generate_moves(Board *board, uint16_t * move_list){
         move_list = add_moves(source, b2 & them, CAPTURE_FLAG, move_list);
     }
 
-    //normal king moves w lookup
+    //normal king moves w lookup, no loop cause u cant have multiple kings
     b1 = board->bitboards[KING_BOARD] & us;
-    while(b1){
-        source = pop_lsb(&b1);
-        b2 = king_move_lookup[source];
-        move_list = add_moves(source, b2 & empty, QUIET_FLAG, move_list);
-        move_list = add_moves(source, b2 & them, CAPTURE_FLAG, move_list);
-    }
-
+    source = pop_lsb(&b1);
+    b2 = king_move_lookup[source];
+    move_list = add_moves(source, b2 & empty, QUIET_FLAG, move_list);
+    move_list = add_moves(source, b2 & them, CAPTURE_FLAG, move_list);
     //castling, wo regard to checks
-
+    //idea for not branching at this stage -> use array, where 0 is null move 1 is castle
+    if((check_ks_castling[board->side_to_move] & board->history[board->ply].castling_rights) && !(occupied & ks_castling_occupy[board->side_to_move])){
+        *move_list++ = ks_castle_move[board->side_to_move];
+    }
+    if((check_qs_castling[board->side_to_move] & board->history[board->ply].castling_rights) && !(occupied & qs_castling_occupy[board->side_to_move])){
+        *move_list++ = qs_castle_move[board->side_to_move];
+    }
     //bishop moves
     b1 = (board->bitboards[BISHOP_BOARD] | board->bitboards[QUEEN_BOARD]) & us;
     while(b1){

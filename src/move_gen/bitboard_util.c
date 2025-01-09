@@ -13,7 +13,10 @@ const int KING_BOARD = 7;
 
 const int QUIET_FLAG = 0;
 const int DOUBLE_PUSH_FLAG = 1;
+const int KS_CASTLE_FLAG = 2;
+const int QS_CASTLE_FLAG = 3;
 const int CAPTURE_FLAG = 4;
+const int EN_PASSANT_FLAG = 5;
 const int KNIGHT_PROMO_FLAG = 8;
 const int BISHOP_PROMO_FLAG = 9;
 const int ROOK_PROMO_FLAG = 10;
@@ -23,13 +26,20 @@ const int BISHOP_PROMO_CAP_FLAG = 13;
 const int ROOK_PROMO_CAP_FLAG = 14;
 const int QUEEN_PROMO_CAP_FLAG = 15;
 
+const int WKS_CASTLING_RIGHTS = 8;
+const int WQS_CASTLING_RIGHTS = 4;
+const int BKS_CASTLING_RIGHTS = 2;
+const int BQS_CASTLING_RIGHTS = 1;
+
 void clear_board(Board *board) {
     for (int i = 0; i < BB_SIZE; i++) {
         board->bitboards[i] = 0;
     }
     for (int i = 0; i < NUM_SQUARES; i++) {
         board->mailbox[i] = 0;
-    }
+    }board->ply = 0;
+    board->history[0].castling_rights = 0;
+    board->history[0].en_passant_square = 0;
 }
 
 //small helper function for parse_board
@@ -74,7 +84,7 @@ void parse_board(Board *board, char *fen) {
             file = 0;
         }else if(*fen > '0' && *fen < '9') { 
             file += *fen - '0';
-        }else if(!((rank * 16 + file) & 0x88)){
+        }else if(rank >= 0 && file < 8){
             int piece = fen_char_to_piece(*fen);
             add_piece(board, piece, rank * 8 + file);
             file++;
@@ -82,6 +92,14 @@ void parse_board(Board *board, char *fen) {
             board->side_to_move = WHITE;
         }else if(*fen == 'b'){
             board->side_to_move = BLACK;
+        }else if(*fen == 'K'){
+            board->history[board->ply].castling_rights |= WKS_CASTLING_RIGHTS;
+        }else if(*fen == 'Q'){
+            board->history[board->ply].castling_rights |= WQS_CASTLING_RIGHTS;
+        }else if(*fen == 'k'){
+            board->history[board->ply].castling_rights |= BKS_CASTLING_RIGHTS;
+        }else if(*fen == 'q'){
+            board->history[board->ply].castling_rights |= BQS_CASTLING_RIGHTS;
         }
         fen++;
     }

@@ -19,7 +19,10 @@ extern const int KING_BOARD;
 
 extern const int QUIET_FLAG;
 extern const int DOUBLE_PUSH_FLAG;
+extern const int KS_CASTLE_FLAG;
+extern const int QS_CASTLE_FLAG;
 extern const int CAPTURE_FLAG;
+extern const int EN_PASSANT_FLAG;
 
 extern const int KNIGHT_PROMO_FLAG;
 extern const int BISHOP_PROMO_FLAG;
@@ -30,10 +33,22 @@ extern const int BISHOP_PROMO_CAP_FLAG;
 extern const int ROOK_PROMO_CAP_FLAG;
 extern const int QUEEN_PROMO_CAP_FLAG;
 
+extern const int WKS_CASTLING_RIGHTS;
+extern const int WQS_CASTLING_RIGHTS;
+extern const int BKS_CASTLING_RIGHTS;
+extern const int BQS_CASTLING_RIGHTS;
+
+typedef struct game_state{
+    uint8_t castling_rights;
+    int en_passant_square;
+} game_state;
+
 typedef struct Board {
     int side_to_move;
     int mailbox[64];
     uint64_t bitboards[8];
+    game_state history[400];
+    int ply;
 } Board;
 
 void init_magics();
