@@ -4,15 +4,20 @@
 int main() {
     
     Board board;
-    char fen[] = "r3knnr/pppbqppp/n3pn2/3p4/1bPP1B1P/2N2NP1/PP2PPB1/R2Q1RK1 b kq - 0 9";
+    char fen[] = "r3k2r/1p6/B6B/3p4/8/3K4/8/8 w kq - 0 1";
     parse_board(&board, fen);
     init_magics();
     uint16_t move_list[218];
     print_board(&board);
     int num_moves = generate_moves(&board, move_list);
-    for(int i = 0; i < num_moves; i++){
+    for(int i = 0; i < 5; i++){
         print_move(move_list[i]);
         printf("\n");
+        make_move(&board, move_list[i]);
+        print_board(&board);
+        unmake_move(&board, move_list[i]);
+        printf("\n");
+        print_board(&board);
     }
     return 0;
 }

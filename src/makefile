@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall -Wextra
 LDLIBS = -lncurses
 objects = graphics.o main.o
-subdir_objects = move_gen/bitboard_util.o move_gen/bitboard.o
+subdir_objects = move_gen/bitboard_util.o move_gen/bitboard.o move_gen/make_move.o
 SUBDIRS = move_gen
 
 all : $(objects)

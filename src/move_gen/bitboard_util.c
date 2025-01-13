@@ -31,6 +31,24 @@ const int WQS_CASTLING_RIGHTS = 4;
 const int BKS_CASTLING_RIGHTS = 2;
 const int BQS_CASTLING_RIGHTS = 1;
 
+const uint64_t occupy_square[64] = {
+    0x1, 0x2, 0x4, 0x8,
+    0x10, 0x20, 0x40, 0x80,
+    0x100, 0x200, 0x400, 0x800,
+    0x1000, 0x2000, 0x4000, 0x8000,
+    0x10000, 0x20000, 0x40000, 0x80000,
+    0x100000, 0x200000, 0x400000, 0x800000,
+    0x1000000, 0x2000000, 0x4000000, 0x8000000,
+    0x10000000, 0x20000000, 0x40000000, 0x80000000,
+    0x100000000, 0x200000000, 0x400000000, 0x800000000,
+    0x1000000000, 0x2000000000, 0x4000000000, 0x8000000000,
+    0x10000000000, 0x20000000000, 0x40000000000, 0x80000000000,
+    0x100000000000, 0x200000000000, 0x400000000000, 0x800000000000,
+    0x1000000000000, 0x2000000000000, 0x4000000000000, 0x8000000000000,
+    0x10000000000000, 0x20000000000000, 0x40000000000000, 0x80000000000000,
+    0x100000000000000, 0x200000000000000, 0x400000000000000, 0x800000000000000,
+    0x1000000000000000, 0x2000000000000000, 0x4000000000000000, 0x8000000000000000};
+
 void clear_board(Board *board) {
     for (int i = 0; i < BB_SIZE; i++) {
         board->bitboards[i] = 0;
@@ -40,6 +58,7 @@ void clear_board(Board *board) {
     }board->ply = 0;
     board->history[0].castling_rights = 0;
     board->history[0].en_passant_square = 0;
+    board->history[0].captured_piece = 0;
 }
 
 //small helper function for parse_board
@@ -105,6 +124,12 @@ void parse_board(Board *board, char *fen) {
     }
 }
 
+void add_piece(Board *board, int piece, int square){
+    board->bitboards[piece & 1] |= occupy_square[square];
+    board->bitboards[piece >> 1] |= occupy_square[square];
+    board->mailbox[square] = piece;
+}
+
 const char square[64][3] = {
     "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1",
     "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2",
@@ -122,8 +147,14 @@ void print_move(uint16_t move){
     int flag = move & 0x0f;
     printf("%s%s%d", square[source], square[dest], flag);
 }
-
+char piece_arr[16] = {'.', '1', '2', '3', 'P', 'p', 'N', 'n', 'B', 'b', 'R', 'r', 'Q', 'q', 'K', 'k'};
 void print_board(Board *board){
+    for(int i = 7; i >= 0; i--){
+        for(int j = 0; j < 8; j++){
+            printf("%c ", piece_arr[board->mailbox[i * 8 + j]]);
+        }printf("\n");
+    }
+    
     for(int k = 0; k < 8; k++){
         print_u64(board->bitboards[k]);
         printf("\n");

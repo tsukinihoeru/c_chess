@@ -191,12 +191,6 @@ static inline uint16_t * add_promo_cap_moves(int source, int dest, uint16_t * mo
     return move_list;
 }
 
-void add_piece(Board *board, int piece, int square){
-    board->bitboards[piece & 1] |= occupy_square[square];
-    board->bitboards[piece >> 1] |= occupy_square[square];
-    board->mailbox[square] = piece;
-}
-
 static inline int pop_lsb(uint64_t *bitboard) {
     int lsb_index = __builtin_ctzll(*bitboard);
     (*bitboard) = (*bitboard) & (*bitboard - 1);

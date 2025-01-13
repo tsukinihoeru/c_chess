@@ -38,9 +38,12 @@ extern const int WQS_CASTLING_RIGHTS;
 extern const int BKS_CASTLING_RIGHTS;
 extern const int BQS_CASTLING_RIGHTS;
 
+extern const uint64_t occupy_square[64];
+
 typedef struct game_state{
     uint8_t castling_rights;
     int en_passant_square;
+    int captured_piece;
 } game_state;
 
 typedef struct Board {
@@ -53,6 +56,9 @@ typedef struct Board {
 
 void init_magics();
 int generate_moves(Board *board, uint16_t * move_list);
+
+void make_move(Board *board, uint16_t move);
+void unmake_move(Board *board, uint16_t move);
 
 /// @brief sets board based on fen string
 void parse_board(Board *board, char *fen);
