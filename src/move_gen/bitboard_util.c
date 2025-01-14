@@ -187,13 +187,7 @@ uint64_t perft(Board *board, int depth){
     for(int i = 0; i < num_moves; i++){
         make_move(board, move_list[i]);
         if(!move_invalid(board, move_list[i])){
-            uint64_t move = perft(board, depth - 1);
-            
-            if(depth == 5){
-                print_move(move_list[i]);
-                printf(" %llu\n", move);
-            }
-            nodes += move;
+            nodes += perft(board, depth - 1);
         }
         unmake_move(board, move_list[i]);
     }return nodes;

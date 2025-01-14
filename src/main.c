@@ -1,18 +1,19 @@
 #include "move_gen/bitboard.h"
 #include "graphics.h"
+#include <time.h> 
 
 int main() {
     
     Board board;
-    char fen[] = "rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8";
-    
+    char fen[] = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     parse_board(&board, fen);
-    printf("HOLY WHAT %d ply: %d\n", board.history[board.ply].castling_rights, board.ply);
     init_magics();
-    
-    uint64_t nodes = perft(&board, 5);
+    clock_t begin = clock();
+    uint64_t nodes = perft(&board, 6);
+    clock_t end = clock();
+    double time_spent = (double)(end - begin)/CLOCKS_PER_SEC;
     printf("%llu\n", nodes);
-    
+    printf("Finished in %f", time_spent);
     return 0;
 }
 
