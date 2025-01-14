@@ -4,21 +4,15 @@
 int main() {
     
     Board board;
-    char fen[] = "r3k2r/1p6/B6B/3p4/8/3K4/8/8 w kq - 0 1";
+    char fen[] = "rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8";
+    
     parse_board(&board, fen);
+    printf("HOLY WHAT %d ply: %d\n", board.history[board.ply].castling_rights, board.ply);
     init_magics();
-    uint16_t move_list[218];
-    print_board(&board);
-    int num_moves = generate_moves(&board, move_list);
-    for(int i = 0; i < 5; i++){
-        print_move(move_list[i]);
-        printf("\n");
-        make_move(&board, move_list[i]);
-        print_board(&board);
-        unmake_move(&board, move_list[i]);
-        printf("\n");
-        print_board(&board);
-    }
+    
+    uint64_t nodes = perft(&board, 5);
+    printf("%llu\n", nodes);
+    
     return 0;
 }
 

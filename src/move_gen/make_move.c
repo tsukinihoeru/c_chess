@@ -22,7 +22,7 @@ void make_move(Board *board, uint16_t move){
     int dest = (move >> 4) & 0x3f;
     int flag = move & 0x0f;
 
-    int en_passant_square = (flag == DOUBLE_PUSH_FLAG) ? source : 0;
+    int en_passant_square = (flag == DOUBLE_PUSH_FLAG) ? dest : 0;
     int captured_piece = 0;
     uint8_t new_castling_rights = board->history[board->ply].castling_rights & castling_shenanigans[source] & castling_shenanigans[dest];
    
@@ -53,11 +53,10 @@ void unmake_move(Board *board, uint16_t move){
     int source = (move >> 10) & 0x3f;
     int dest = (move >> 4) & 0x3f;
     int flag = move & 0x0f;
-
     move_piece(board, dest, source);
     if(flag & check_capture){
         int piece = board->history[board->ply].captured_piece;
-        int capture_location = (flag == EN_PASSANT_FLAG) ? board->history[board->ply].en_passant_square : dest;
+        int capture_location = (flag == EN_PASSANT_FLAG) ? board->history[board->ply - 1].en_passant_square : dest;
         board->bitboards[piece >> 1] |= occupy_square[capture_location];
         board->bitboards[piece & 1] |= occupy_square[capture_location];
         board->mailbox[capture_location] = piece;
@@ -73,6 +72,17 @@ void unmake_move(Board *board, uint16_t move){
     }
     board->side_to_move = !board->side_to_move;
     board->ply--;
+}
+
+int castle_valid_check[6][3] = {{0, 0, 0},{0, 0, 0},{60, 61, 62}, {60, 59, 58},{4,5,6},{2,3,4}};
+int move_invalid(Board *board, uint16_t move){
+    int flag = move & 0x0f;
+    if((flag) != KS_CASTLE_FLAG && (flag) != QS_CASTLE_FLAG){
+        return square_attacked(board,  __builtin_ctzll(board->bitboards[KING_BOARD] & board->bitboards[!board->side_to_move]));
+    }int check = flag + board->side_to_move * 2;
+    return (square_attacked(board, castle_valid_check[check][0]) || 
+             square_attacked(board, castle_valid_check[check][1]) || 
+             square_attacked(board, castle_valid_check[check][2]));
 }
 
 static inline void move_piece(Board *board, int source, int dest){

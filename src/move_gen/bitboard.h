@@ -56,9 +56,11 @@ typedef struct Board {
 
 void init_magics();
 int generate_moves(Board *board, uint16_t * move_list);
+int square_attacked(Board *board, int square);
 
 void make_move(Board *board, uint16_t move);
 void unmake_move(Board *board, uint16_t move);
+int move_invalid(Board *board, uint16_t move);
 
 /// @brief sets board based on fen string
 void parse_board(Board *board, char *fen);
@@ -68,5 +70,6 @@ void add_piece(Board *board, int piece, int square);
 void print_board(Board *board);
 void print_move(uint16_t move);
 void print_u64(uint64_t board);
+uint64_t perft(Board *board, int depth);
 
 #endif

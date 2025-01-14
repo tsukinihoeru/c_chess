@@ -97,7 +97,7 @@ void parse_board(Board *board, char *fen) {
     clear_board(board);
     int rank = 7;
     int file = 0;
-    while(*fen != EOF){
+    while(*fen != '\0'){
         if(*fen == '/'){
             rank--;
             file = 0;
@@ -155,10 +155,11 @@ void print_board(Board *board){
         }printf("\n");
     }
     
+    /*
     for(int k = 0; k < 8; k++){
         print_u64(board->bitboards[k]);
         printf("\n");
-    }
+    }*/
 }
 
 void print_u64(uint64_t board){
@@ -174,4 +175,26 @@ void print_u64(uint64_t board){
             }printf(" ");
         }printf("\n");
     }
+}
+
+uint64_t perft(Board *board, int depth){
+    if(depth == 0)
+        return 1;
+    uint64_t nodes = 0;
+    uint16_t move_list[256];
+    int num_moves;
+    num_moves = generate_moves(board, move_list);
+    for(int i = 0; i < num_moves; i++){
+        make_move(board, move_list[i]);
+        if(!move_invalid(board, move_list[i])){
+            uint64_t move = perft(board, depth - 1);
+            
+            if(depth == 5){
+                print_move(move_list[i]);
+                printf(" %llu\n", move);
+            }
+            nodes += move;
+        }
+        unmake_move(board, move_list[i]);
+    }return nodes;
 }

@@ -28,13 +28,15 @@ static inline uint64_t mirror(uint64_t x){
    x = ((x >> 4) & k4) + 16*(x & k4);
    return x;
 }
+const uint64_t not_h_file = 0x7F7F7F7F7F7F7F7F;
+const uint64_t not_a_file = 0xFEFEFEFEFEFEFEFE;
 //see if program can be optimized by removing these functions, prolly will do nothing
 static inline uint64_t shift_up_one(uint64_t b){return b << 8;}
 static inline uint64_t shift_down_one(uint64_t b){return b >> 8;}
-static inline uint64_t shift_left_up_one(uint64_t b){return b << 7;}
-static inline uint64_t shift_right_up_one(uint64_t b){return b << 9;}
-static inline uint64_t shift_left_down_one(uint64_t b){return b >> 7;}
-static inline uint64_t shift_right_down_one(uint64_t b){return b >> 9;}
+static inline uint64_t shift_left_up_one(uint64_t b){return (b << 7) & not_h_file;}
+static inline uint64_t shift_right_up_one(uint64_t b){return (b << 9) & not_a_file;}
+static inline uint64_t shift_right_down_one(uint64_t b){return (b >> 7) & not_a_file;}
+static inline uint64_t shift_left_down_one(uint64_t b){return (b >> 9) & not_h_file;}
 static inline uint64_t hyp_quint(int source, uint64_t mask, uint64_t occupied_board){
     return (((mask & occupied_board) - occupy_square[source] * 2) ^
             reverse(reverse(mask & occupied_board) - reverse(occupy_square[source]) * 2)) & mask;
@@ -43,8 +45,8 @@ static inline uint64_t hyp_quint_horiz(int source, uint64_t mask, uint64_t occup
     return (((mask & occupied_board) - occupy_square[source] * 2) ^
             mirror(mirror(mask & occupied_board) - mirror(occupy_square[source]) * 2)) & mask;
 }
-const int undo_left_capture[2] = {-7, 7};
-const int undo_right_capture[2] = {-9, 9};
+const int undo_left_capture[2] = {-7, 9};
+const int undo_right_capture[2] = {-9, 7};
 const int undo_single_push[2] = {-8, 8};
 const int undo_double_push[2] = {-16, 16};
 const uint64_t double_push_mask[2] = {0x00000000ff000000,  0x000000ff00000000};
@@ -195,6 +197,27 @@ static inline int pop_lsb(uint64_t *bitboard) {
     int lsb_index = __builtin_ctzll(*bitboard);
     (*bitboard) = (*bitboard) & (*bitboard - 1);
     return lsb_index; 
+}
+
+int square_attacked(Board *board, int square){
+    uint64_t occupied = board->bitboards[WHITE] | board->bitboards[BLACK];
+    if(pawn_capture_lookup[!board->side_to_move][square] & board->bitboards[board->side_to_move] & board->bitboards[PAWN_BOARD])
+        return 1;
+    if(knight_move_lookup[square] & board->bitboards[board->side_to_move] & board->bitboards[KNIGHT_BOARD])
+        return 1;
+    if(king_move_lookup[square]  & board->bitboards[board->side_to_move] & board->bitboards[KING_BOARD])
+        return 1;
+    uint64_t magic_index = occupied & bishop_occupancy_mask[square];
+    magic_index *= bishop_magic[square];
+    magic_index >>= bishop_magic_shift[square];
+    if(bishop_magic_ptrs[square][magic_index] & board->bitboards[board->side_to_move] & (board->bitboards[BISHOP_BOARD] | board->bitboards[QUEEN_BOARD]))
+        return 1;
+    magic_index = occupied & rook_occupancy_mask[square];
+    magic_index *= rook_magic[square];
+    magic_index >>= rook_magic_shift[square];
+    if(rook_magic_ptrs[square][magic_index] & board->bitboards[board->side_to_move] & (board->bitboards[ROOK_BOARD] | board->bitboards[QUEEN_BOARD]))
+        return 1;
+    return 0;
 }
 
 int blocker_squares [15];
