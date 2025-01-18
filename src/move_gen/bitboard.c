@@ -28,8 +28,7 @@ static inline uint64_t mirror(uint64_t x){
    x = ((x >> 4) & k4) + 16*(x & k4);
    return x;
 }
-const uint64_t not_h_file = 0x7F7F7F7F7F7F7F7F;
-const uint64_t not_a_file = 0xFEFEFEFEFEFEFEFE;
+const uint64_t not_h_file = 0x7F7F7F7F7F7F7F7F, not_a_file = 0xFEFEFEFEFEFEFEFE;
 //see if program can be optimized by removing these functions, prolly will do nothing
 static inline uint64_t shift_up_one(uint64_t b){return b << 8;}
 static inline uint64_t shift_down_one(uint64_t b){return b >> 8;}
@@ -45,29 +44,23 @@ static inline uint64_t hyp_quint_horiz(int source, uint64_t mask, uint64_t occup
     return (((mask & occupied_board) - occupy_square[source] * 2) ^
             mirror(mirror(mask & occupied_board) - mirror(occupy_square[source]) * 2)) & mask;
 }
-const int undo_left_capture[2] = {-7, 9};
-const int undo_right_capture[2] = {-9, 7};
-const int undo_single_push[2] = {-8, 8};
-const int undo_double_push[2] = {-16, 16};
+const int undo_left_capture[2] = {-7, 9}, undo_right_capture[2] = {-9, 7}, 
+          undo_single_push[2] = {-8, 8}, undo_double_push[2] = {-16, 16};
 const uint64_t double_push_mask[2] = {0x00000000ff000000,  0x000000ff00000000};
 const uint64_t promotion_rank[2] = {0xff00000000000000, 0x00000000000000ff};
 const uint64_t non_promotion_mask[2] = {0x00ffffffffffffff, 0xffffffffffffff00};
-uint64_t *rook_magic_ptrs[64];
-uint64_t *bishop_magic_ptrs[64];
-uint64_t *attack_table;
-const int check_ks_castling[2] = {8, 2};
-const uint64_t ks_castling_occupy[2] = {0x60, 0x6000000000000000};
-const uint64_t qs_castling_occupy[2] = {0xe, 0xe00000000000000};
-const int check_qs_castling[2] = {4, 1};
-const uint16_t ks_castle_move [2] = {4194, 62434};
-const uint16_t qs_castle_move [2] = {4131, 62371};
+uint64_t *rook_magic_ptrs[64], *bishop_magic_ptrs[64], *attack_table;
+const int check_ks_castling[2] = {8, 2}, check_qs_castling[2] = {4, 1};
+const uint64_t ks_castling_occupy[2] = {0x60, 0x6000000000000000}, qs_castling_occupy[2] = {0xe, 0xe00000000000000};
+const uint16_t ks_castle_move [2] = {4194, 62434}, qs_castle_move [2] = {4131, 62371};
 
 int generate_moves(Board *board, uint16_t * move_list){
     uint16_t * og_list = move_list;
     uint64_t b1, b2, b3;
     int source;
-    uint64_t us = board->bitboards[board->side_to_move];
-    uint64_t them = board->bitboards[!board->side_to_move];
+    int side = board->side_to_move;
+    uint64_t us = board->bitboards[side];
+    uint64_t them = board->bitboards[!side];
     uint64_t occupied = us | them;
     uint64_t empty = ~occupied;
     //pawn moves, if branch mispredictions happen often, program can be sped up by branchless programming
@@ -77,51 +70,51 @@ int generate_moves(Board *board, uint16_t * move_list){
     b2 = b1 & en_passant_lookup[board->history[board->ply].en_passant_square];
     while(b2){
         int source = pop_lsb(&b2);
-        *move_list++ = (source << 10) | ((board->history[board->ply].en_passant_square - undo_single_push[board->side_to_move]) << 4) | EN_PASSANT_FLAG;
+        *move_list++ = (source << 10) | ((board->history[board->ply].en_passant_square - undo_single_push[side]) << 4) | EN_PASSANT_FLAG;
     }
-    b2 = board->side_to_move ? shift_left_down_one(b1) : shift_left_up_one(b1);
+    b2 = side ? shift_left_down_one(b1) : shift_left_up_one(b1);
     b2 &= them;
-    b3 = b2 & non_promotion_mask[board->side_to_move];
+    b3 = b2 & non_promotion_mask[side];
     while(b3){
         int dest = pop_lsb(&b3);
-        *move_list++ = ((dest + undo_left_capture[board->side_to_move]) << 10) | (dest << 4) | CAPTURE_FLAG;
+        *move_list++ = ((dest + undo_left_capture[side]) << 10) | (dest << 4) | CAPTURE_FLAG;
     }
-    b3 = b2 & promotion_rank[board->side_to_move];
+    b3 = b2 & promotion_rank[side];
     while(b3){
         int dest = pop_lsb(&b3);
-        move_list = add_promo_cap_moves(dest + undo_left_capture[board->side_to_move], dest, move_list);
+        move_list = add_promo_cap_moves(dest + undo_left_capture[side], dest, move_list);
     }
-    b2 = board->side_to_move ? shift_right_down_one(b1) : shift_right_up_one(b1);
+    b2 = side ? shift_right_down_one(b1) : shift_right_up_one(b1);
     b2 &= them;
-    b3 = b2 & non_promotion_mask[board->side_to_move];
+    b3 = b2 & non_promotion_mask[side];
     while(b3){
         int dest = pop_lsb(&b3);
-        *move_list++ = ((dest + undo_right_capture[board->side_to_move]) << 10) | (dest << 4) | CAPTURE_FLAG;
+        *move_list++ = ((dest + undo_right_capture[side]) << 10) | (dest << 4) | CAPTURE_FLAG;
     }
-    b3 = b2 & promotion_rank[board->side_to_move];
+    b3 = b2 & promotion_rank[side];
     while(b3){
         int dest = pop_lsb(&b3);
-        move_list = add_promo_cap_moves(dest + undo_right_capture[board->side_to_move], dest, move_list);
+        move_list = add_promo_cap_moves(dest + undo_right_capture[side], dest, move_list);
     }
-    b2 = board->side_to_move ? shift_down_one(b1) : shift_up_one(b1);
+    b2 = side ? shift_down_one(b1) : shift_up_one(b1);
     b2 &= empty;
     //double pawn push
-    b3 = board->side_to_move ? shift_down_one(b2) : shift_up_one(b2);
-    b3 &= empty & double_push_mask[board->side_to_move];
+    b3 = side ? shift_down_one(b2) : shift_up_one(b2);
+    b3 &= empty & double_push_mask[side];
     while(b3){
         int dest = pop_lsb(&b3);
-         *move_list++ = ((dest + undo_double_push[board->side_to_move]) << 10) | (dest << 4) | DOUBLE_PUSH_FLAG;
+         *move_list++ = ((dest + undo_double_push[side]) << 10) | (dest << 4) | DOUBLE_PUSH_FLAG;
     }
     //non promotions
-    b3 = b2 & non_promotion_mask[board->side_to_move];
+    b3 = b2 & non_promotion_mask[side];
     while(b3){
         int dest = pop_lsb(&b3);
-        *move_list++ = ((dest + undo_single_push[board->side_to_move]) << 10) | (dest << 4) | QUIET_FLAG;
+        *move_list++ = ((dest + undo_single_push[side]) << 10) | (dest << 4) | QUIET_FLAG;
     }
-    b3 = b2 & promotion_rank[board->side_to_move];
+    b3 = b2 & promotion_rank[side];
     while(b3){
         int dest = pop_lsb(&b3);
-        move_list = add_promo_moves(dest + undo_single_push[board->side_to_move], dest, move_list);
+        move_list = add_promo_moves(dest + undo_single_push[side], dest, move_list);
     }
 
     //knight moves w lookup table
@@ -141,11 +134,11 @@ int generate_moves(Board *board, uint16_t * move_list){
     move_list = add_moves(source, b2 & them, CAPTURE_FLAG, move_list);
     //castling, wo regard to checks
     //idea for not branching at this stage -> use array, where 0 is null move 1 is castle
-    if((check_ks_castling[board->side_to_move] & board->history[board->ply].castling_rights) && !(occupied & ks_castling_occupy[board->side_to_move])){
-        *move_list++ = ks_castle_move[board->side_to_move];
+    if((check_ks_castling[side] & board->history[board->ply].castling_rights) && !(occupied & ks_castling_occupy[side])){
+        *move_list++ = ks_castle_move[side];
     }
-    if((check_qs_castling[board->side_to_move] & board->history[board->ply].castling_rights) && !(occupied & qs_castling_occupy[board->side_to_move])){
-        *move_list++ = qs_castle_move[board->side_to_move];
+    if((check_qs_castling[side] & board->history[board->ply].castling_rights) && !(occupied & qs_castling_occupy[side])){
+        *move_list++ = qs_castle_move[side];
     }
     //bishop moves
     b1 = (board->bitboards[BISHOP_BOARD] | board->bitboards[QUEEN_BOARD]) & us;
@@ -201,21 +194,22 @@ static inline int pop_lsb(uint64_t *bitboard) {
 
 int square_attacked(Board *board, int square){
     uint64_t occupied = board->bitboards[WHITE] | board->bitboards[BLACK];
-    if(pawn_capture_lookup[!board->side_to_move][square] & board->bitboards[board->side_to_move] & board->bitboards[PAWN_BOARD])
+    int side = board->side_to_move;
+    if(pawn_capture_lookup[!side][square] & board->bitboards[side] & board->bitboards[PAWN_BOARD])
         return 1;
-    if(knight_move_lookup[square] & board->bitboards[board->side_to_move] & board->bitboards[KNIGHT_BOARD])
+    if(knight_move_lookup[square] & board->bitboards[side] & board->bitboards[KNIGHT_BOARD])
         return 1;
-    if(king_move_lookup[square]  & board->bitboards[board->side_to_move] & board->bitboards[KING_BOARD])
+    if(king_move_lookup[square]  & board->bitboards[side] & board->bitboards[KING_BOARD])
         return 1;
     uint64_t magic_index = occupied & bishop_occupancy_mask[square];
     magic_index *= bishop_magic[square];
     magic_index >>= bishop_magic_shift[square];
-    if(bishop_magic_ptrs[square][magic_index] & board->bitboards[board->side_to_move] & (board->bitboards[BISHOP_BOARD] | board->bitboards[QUEEN_BOARD]))
+    if(bishop_magic_ptrs[square][magic_index] & board->bitboards[side] & (board->bitboards[BISHOP_BOARD] | board->bitboards[QUEEN_BOARD]))
         return 1;
     magic_index = occupied & rook_occupancy_mask[square];
     magic_index *= rook_magic[square];
     magic_index >>= rook_magic_shift[square];
-    if(rook_magic_ptrs[square][magic_index] & board->bitboards[board->side_to_move] & (board->bitboards[ROOK_BOARD] | board->bitboards[QUEEN_BOARD]))
+    if(rook_magic_ptrs[square][magic_index] & board->bitboards[side] & (board->bitboards[ROOK_BOARD] | board->bitboards[QUEEN_BOARD]))
         return 1;
     return 0;
 }
@@ -250,8 +244,8 @@ void init_magics(){
         int power_size = get_occupancy_boards(&occupancy_boards, rook_occupancy_mask[i]);
         for(int j = 0; j < power_size; j++){
             uint64_t occupied_board = occupancy_boards[j];
-            uint64_t attack_board = hyp_quint(i, file_masks[source_to_file[i]], occupied_board)
-                                    | hyp_quint_horiz(i, rank_masks[source_to_rank[i]], occupied_board);
+            uint64_t attack_board = hyp_quint(i, file_masks[i % 8], occupied_board)
+                                    | hyp_quint_horiz(i, rank_masks[i / 8], occupied_board);
             occupied_board *= rook_magic[i];
             occupied_board >>= rook_magic_shift[i];
             rook_magic_ptrs[i][occupied_board] = attack_board;
@@ -264,8 +258,8 @@ void init_magics(){
         int power_size = get_occupancy_boards(&occupancy_boards, bishop_occupancy_mask[i]);
         for(int j = 0; j < power_size; j++){
             uint64_t occupied_board = occupancy_boards[j];
-            uint64_t attack_board = hyp_quint(i, diagonal_masks[source_to_diagonal[i]], occupied_board)
-                                    | hyp_quint(i, antidiagonal_masks[source_to_antidiagonal[i]], occupied_board);
+            uint64_t attack_board = hyp_quint(i, diagonal_masks[7 - (i % 8) + i/8], occupied_board)
+                                    | hyp_quint(i, antidiagonal_masks[i % 8 + i/8], occupied_board);
             occupied_board *= bishop_magic[i];
             occupied_board >>= bishop_magic_shift[i];
             bishop_magic_ptrs[i][occupied_board] = attack_board;

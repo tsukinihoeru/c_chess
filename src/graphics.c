@@ -17,60 +17,6 @@ void init_graphics(){
     refresh();
 }
 
-void init_colors() {
-    start_color();
-    init_color(COLOR_GREY, 160, 160, 160);
-    init_color(COLOR_DARK_RED, 240, 120, 120);
-    init_pair(WHITE_PIECE_LIGHT_SQUARE_C, WHITE_PIECE_COLOR, LIGHT_SQUARE_COLOR);
-    init_pair(WHITE_PIECE_DARK_SQUARE_C, WHITE_PIECE_COLOR, DARK_SQUARE_COLOR);
-    init_pair(WHITE_PIECE_HIGHLIGHT_SQUARE_C, WHITE_PIECE_COLOR, HIGHLIGHT_SQUARE_COLOR);
-    init_pair(BLACK_PIECE_LIGHT_SQUARE_C, BLACK_PIECE_COLOR, LIGHT_SQUARE_COLOR);
-    init_pair(BLACK_PIECE_DARK_SQUARE_C, BLACK_PIECE_COLOR, DARK_SQUARE_COLOR);
-    init_pair(BLACK_PIECE_HIGHLIGHT_SQUARE_C, BLACK_PIECE_COLOR, HIGHLIGHT_SQUARE_COLOR);
-}
-
-static int get_square_color(int piece, int i, int j) {
-    if (piece & 1) {
-        if(i * 8 + j == highlighted_square)
-            return BLACK_PIECE_HIGHLIGHT_SQUARE_C;
-        else if (i % 2 == j % 2) {
-            return BLACK_PIECE_DARK_SQUARE_C;
-        } else {
-            return BLACK_PIECE_LIGHT_SQUARE_C;
-        }
-    } else {
-        if(i * 8 + j == highlighted_square)
-            return WHITE_PIECE_HIGHLIGHT_SQUARE_C;
-        else if (i % 2 == j % 2) {
-            return WHITE_PIECE_DARK_SQUARE_C;
-        } else {
-            return WHITE_PIECE_LIGHT_SQUARE_C;
-        }
-    }
-}
-
-void draw_board(WINDOW *win, int *mailbox) {
-    mvprintw(51, 0, "Square: %d", highlighted_square);
-    for (int i = 7; i >= 0; i--) {
-        for(int k = 0; k < 6; k++){
-            wmove(win, (7 - i) * 6 + k, 0);
-            for (int j = 0; j < 8; j++) {
-                int piece = mailbox[i * 8 + j];
-                int color = get_square_color(piece, i, j);
-                wattron(win, COLOR_PAIR(color));
-                if(piece){
-                    wprintw(win, "%s", piece_art[(piece >> 1) - 2][k]);
-                }
-                else{
-                    wprintw(win, "            ");
-                }
-                wattroff(win, COLOR_PAIR(color));
-            }
-        }
-    }
-    wrefresh(win);
-};
-
 static const char splash_message[] = ">Press Any Key to Continue<";
 
 void draw_splash_screen(WINDOW * win){
@@ -94,11 +40,12 @@ bool point_in_window(WINDOW *win, int px, int py){
     return px >= beg_x && px < beg_x + size_x && py >= beg_y && py < beg_y + size_y;
 }
 
-int cursor_to_square_index(int cposx, int cposy){
-    int file = (cposx - BOARD_HPAD)/SQUARE_WIDTH;
-    int rank = 7 - (cposy - BOARD_VPAD)/SQUARE_HEIGHT;
-    if(file > 7 || file < 0 || rank > 7 || rank < 0)
-        return -1;
-    int square = rank * 8 + file;
-    return square;
+int cursor_to_window_x(int cposx){
+    int resx = (cposx - BOARD_HPAD);
+    return resx;
+}
+
+int cursor_to_window_y(int cposy){
+    int resy = (cposy - BOARD_VPAD);
+    return resy;
 }

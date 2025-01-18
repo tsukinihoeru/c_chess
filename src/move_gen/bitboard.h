@@ -6,38 +6,14 @@
 #ifndef BITBOARD_H
 #define BITBOARD_H
 
-extern const int BB_SIZE;
-extern const int NUM_SQUARES;
-extern const int WHITE;
-extern const int BLACK;
-extern const int PAWN_BOARD;
-extern const int KNIGHT_BOARD;
-extern const int BISHOP_BOARD;
-extern const int ROOK_BOARD;
-extern const int QUEEN_BOARD;
-extern const int KING_BOARD;
+extern const int BB_SIZE, NUM_SQUARES;
+extern const int WHITE, BLACK, PAWN_BOARD, KNIGHT_BOARD, BISHOP_BOARD, ROOK_BOARD, QUEEN_BOARD, KING_BOARD;
 
-extern const int QUIET_FLAG;
-extern const int DOUBLE_PUSH_FLAG;
-extern const int KS_CASTLE_FLAG;
-extern const int QS_CASTLE_FLAG;
-extern const int CAPTURE_FLAG;
-extern const int EN_PASSANT_FLAG;
+extern const int QUIET_FLAG, DOUBLE_PUSH_FLAG, KS_CASTLE_FLAG, QS_CASTLE_FLAG, CAPTURE_FLAG, EN_PASSANT_FLAG,
+                 KNIGHT_PROMO_FLAG, BISHOP_PROMO_FLAG, ROOK_PROMO_FLAG, QUEEN_PROMO_FLAG, KNIGHT_PROMO_CAP_FLAG,
+                 BISHOP_PROMO_CAP_FLAG, ROOK_PROMO_CAP_FLAG, QUEEN_PROMO_CAP_FLAG;
 
-extern const int KNIGHT_PROMO_FLAG;
-extern const int BISHOP_PROMO_FLAG;
-extern const int ROOK_PROMO_FLAG;
-extern const int QUEEN_PROMO_FLAG;
-extern const int KNIGHT_PROMO_CAP_FLAG;
-extern const int BISHOP_PROMO_CAP_FLAG;
-extern const int ROOK_PROMO_CAP_FLAG;
-extern const int QUEEN_PROMO_CAP_FLAG;
-
-extern const int WKS_CASTLING_RIGHTS;
-extern const int WQS_CASTLING_RIGHTS;
-extern const int BKS_CASTLING_RIGHTS;
-extern const int BQS_CASTLING_RIGHTS;
-
+extern const int WKS_CASTLING_RIGHTS, WQS_CASTLING_RIGHTS, BKS_CASTLING_RIGHTS, BQS_CASTLING_RIGHTS;
 extern const uint64_t occupy_square[64];
 
 typedef struct game_state{
@@ -62,7 +38,6 @@ void make_move(Board *board, uint16_t move);
 void unmake_move(Board *board, uint16_t move);
 int move_invalid(Board *board, uint16_t move);
 
-/// @brief sets board based on fen string
 void parse_board(Board *board, char *fen);
 void clear_board(Board *board);
 void add_piece(Board *board, int piece, int square);

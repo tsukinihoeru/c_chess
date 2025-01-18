@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Wextra
 LDLIBS = -lncurses
-objects = graphics.o main.o
+objects = graphics.o main.o buttons.o board_window.o colors.o
 subdir_objects = move_gen/bitboard_util.o move_gen/bitboard.o move_gen/make_move.o
 SUBDIRS = move_gen
 
@@ -14,6 +14,9 @@ all : $(objects)
 
 graphics.o : graphics.h
 main.o : move_gen/bitboard.h graphics.h
+buttons.o : graphics.h
+board_window.o : move_gen/bitboard.h graphics.h
+colors.o : graphics.h
 
 clean :
 	rm $(objects)

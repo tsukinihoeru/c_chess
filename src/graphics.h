@@ -1,37 +1,32 @@
 #include <ncurses.h>
-#include <wchar.h>
 #include <time.h>
+#include <stdbool.h>
+#include <stdio.h>
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
-
-static const short COLOR_GREY = 14;
-static const short COLOR_DARK_RED = 15;
-static const short WHITE_PIECE_COLOR = COLOR_WHITE;
-static const short BLACK_PIECE_COLOR = COLOR_GREEN;
-static const short HIGHLIGHT_SQUARE_COLOR = COLOR_DARK_RED;
-static const short DARK_SQUARE_COLOR = COLOR_BLACK;
-static const short LIGHT_SQUARE_COLOR = COLOR_GREY;
-
-
-static const short BLACK_PIECE_DARK_SQUARE_C = 2;
-static const short BLACK_PIECE_LIGHT_SQUARE_C = 3;
-static const short WHITE_PIECE_DARK_SQUARE_C = 4;
-static const short WHITE_PIECE_LIGHT_SQUARE_C = 5;
-static const short BLACK_PIECE_HIGHLIGHT_SQUARE_C = 6;
-static const short WHITE_PIECE_HIGHLIGHT_SQUARE_C = 7;
-
 
 static const int SQUARE_HEIGHT = 6;
 static const int SQUARE_WIDTH = 12;
 static const int BOARD_HPAD = 2;
 static const int BOARD_VPAD = 2;
 
+//graphics.c functions
 void init_graphics();
 void init_colors();
-void draw_board(WINDOW *win, int *mailbox);
+
 bool point_in_window(WINDOW *win, int px, int py);
-int cursor_to_square_index(int cposx, int cposy);
+int cursor_to_window_x(int cposx);
+int cursor_to_window_y(int cposy);
 void set_highlighted_square(int square);
+
+//board_window functions
+void init_board_win(WINDOW *win);
+void receive_input(int win_x, int win_y);
+void draw_board();
+bool square_highlighted(int square);
+
+//test functions (delete later)
+void exit_curses_get_fen_input(char *str, int lim);
 
 static const char piece_art[6][SQUARE_HEIGHT][SQUARE_WIDTH + 1] = {
     {

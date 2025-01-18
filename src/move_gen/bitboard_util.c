@@ -2,34 +2,15 @@
 
 const int BB_SIZE = 8;
 const int NUM_SQUARES = 64;
-const int WHITE = 0;
-const int BLACK = 1;
-const int PAWN_BOARD = 2;
-const int KNIGHT_BOARD = 3;
-const int BISHOP_BOARD = 4;
-const int ROOK_BOARD = 5;
-const int QUEEN_BOARD = 6;
-const int KING_BOARD = 7;
+const int WHITE = 0, BLACK = 1, PAWN_BOARD = 2, KNIGHT_BOARD = 3, BISHOP_BOARD = 4, 
+          ROOK_BOARD = 5, QUEEN_BOARD = 6, KING_BOARD = 7;
 
-const int QUIET_FLAG = 0;
-const int DOUBLE_PUSH_FLAG = 1;
-const int KS_CASTLE_FLAG = 2;
-const int QS_CASTLE_FLAG = 3;
-const int CAPTURE_FLAG = 4;
-const int EN_PASSANT_FLAG = 5;
-const int KNIGHT_PROMO_FLAG = 8;
-const int BISHOP_PROMO_FLAG = 9;
-const int ROOK_PROMO_FLAG = 10;
-const int QUEEN_PROMO_FLAG = 11;
-const int KNIGHT_PROMO_CAP_FLAG = 12;
-const int BISHOP_PROMO_CAP_FLAG = 13;
-const int ROOK_PROMO_CAP_FLAG = 14;
-const int QUEEN_PROMO_CAP_FLAG = 15;
+const int QUIET_FLAG = 0, DOUBLE_PUSH_FLAG = 1, KS_CASTLE_FLAG = 2, QS_CASTLE_FLAG = 3, CAPTURE_FLAG = 4, 
+          EN_PASSANT_FLAG = 5, KNIGHT_PROMO_FLAG = 8, BISHOP_PROMO_FLAG = 9, ROOK_PROMO_FLAG = 10, 
+          QUEEN_PROMO_FLAG = 11, KNIGHT_PROMO_CAP_FLAG = 12, BISHOP_PROMO_CAP_FLAG = 13, 
+          ROOK_PROMO_CAP_FLAG = 14, QUEEN_PROMO_CAP_FLAG = 15;
 
-const int WKS_CASTLING_RIGHTS = 8;
-const int WQS_CASTLING_RIGHTS = 4;
-const int BKS_CASTLING_RIGHTS = 2;
-const int BQS_CASTLING_RIGHTS = 1;
+const int WKS_CASTLING_RIGHTS = 8, WQS_CASTLING_RIGHTS = 4, BKS_CASTLING_RIGHTS = 2, BQS_CASTLING_RIGHTS = 1;
 
 const uint64_t occupy_square[64] = {
     0x1, 0x2, 0x4, 0x8,
@@ -47,15 +28,15 @@ const uint64_t occupy_square[64] = {
     0x1000000000000, 0x2000000000000, 0x4000000000000, 0x8000000000000,
     0x10000000000000, 0x20000000000000, 0x40000000000000, 0x80000000000000,
     0x100000000000000, 0x200000000000000, 0x400000000000000, 0x800000000000000,
-    0x1000000000000000, 0x2000000000000000, 0x4000000000000000, 0x8000000000000000};
+    0x1000000000000000, 0x2000000000000000, 0x4000000000000000, 0x8000000000000000
+};
 
 void clear_board(Board *board) {
-    for (int i = 0; i < BB_SIZE; i++) {
+    for (int i = 0; i < BB_SIZE; i++) 
         board->bitboards[i] = 0;
-    }
-    for (int i = 0; i < NUM_SQUARES; i++) {
+    for (int i = 0; i < NUM_SQUARES; i++) 
         board->mailbox[i] = 0;
-    }board->ply = 0;
+    board->ply = 0;
     board->history[0].castling_rights = 0;
     board->history[0].en_passant_square = 0;
     board->history[0].captured_piece = 0;
@@ -66,30 +47,11 @@ int fen_char_to_piece(char c){
     int color = BLACK;
     if(isupper(c))
         color = WHITE;
-    
     c = toupper(c);
-
-    switch (c){
-        case 'P':
-            return PAWN_BOARD * 2 + color;
-        break;
-        case 'N':
-            return KNIGHT_BOARD * 2 + color;
-        break;
-        case 'B':
-            return BISHOP_BOARD * 2 + color;
-        break;
-        case 'R':
-            return ROOK_BOARD * 2 + color;
-        break;
-        case 'Q':
-            return QUEEN_BOARD * 2 + color;
-        break;
-        case 'K':
-            return KING_BOARD * 2 + color;
-        break;
-    }
-    return -1;
+    int piece_val[100];
+    piece_val['P'] = PAWN_BOARD, piece_val['N'] = KNIGHT_BOARD, piece_val['B'] = BISHOP_BOARD, 
+    piece_val['R'] = ROOK_BOARD, piece_val['Q'] = QUEEN_BOARD, piece_val['K'] = KING_BOARD;
+    return piece_val[(int) c] * 2 + color;   
 }
 
 //Errors with invalid fen, use separate function to validate fen
@@ -117,9 +79,8 @@ void parse_board(Board *board, char *fen) {
             board->history[board->ply].castling_rights |= WQS_CASTLING_RIGHTS;
         }else if(*fen == 'k'){
             board->history[board->ply].castling_rights |= BKS_CASTLING_RIGHTS;
-        }else if(*fen == 'q'){
+        }else if(*fen == 'q')
             board->history[board->ply].castling_rights |= BQS_CASTLING_RIGHTS;
-        }
         fen++;
     }
 }
@@ -147,6 +108,7 @@ void print_move(uint16_t move){
     int flag = move & 0x0f;
     printf("%s%s%d", square[source], square[dest], flag);
 }
+
 char piece_arr[16] = {'.', '1', '2', '3', 'P', 'p', 'N', 'n', 'B', 'b', 'R', 'r', 'Q', 'q', 'K', 'k'};
 void print_board(Board *board){
     for(int i = 7; i >= 0; i--){
@@ -154,12 +116,6 @@ void print_board(Board *board){
             printf("%c ", piece_arr[board->mailbox[i * 8 + j]]);
         }printf("\n");
     }
-    
-    /*
-    for(int k = 0; k < 8; k++){
-        print_u64(board->bitboards[k]);
-        printf("\n");
-    }*/
 }
 
 void print_u64(uint64_t board){
