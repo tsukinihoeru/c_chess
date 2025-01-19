@@ -1,5 +1,5 @@
 #include "graphics.h"
-#include "move_gen/bitboard.h"
+#include "../move_gen/bitboard.h"
 
 const char piece_art[6][SQUARE_HEIGHT][SQUARE_WIDTH + 1];
 

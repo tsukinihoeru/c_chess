@@ -1,5 +1,5 @@
 #include "move_gen/bitboard.h"
-#include "graphics.h"
+#include "graphics/graphics.h"
 #include <time.h> 
 char str [80];
 
