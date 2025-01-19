@@ -2,6 +2,7 @@
 #include <time.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <assert.h>
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
@@ -25,54 +26,17 @@ void receive_input(int win_x, int win_y);
 void draw_board();
 bool square_highlighted(int square);
 
+//move_history functions
+void reset_move_history();
+bool can_undo_move();
+bool can_redo_move();
+uint16_t undo_move();
+uint16_t redo_move();
+void append_move(uint16_t move);
+
+
 //test functions (delete later)
 void exit_curses_get_fen_input(char *str, int lim);
-
-static const char piece_art[6][SQUARE_HEIGHT][SQUARE_WIDTH + 1] = {
-    {
-        "            ",
-        "     _      ",
-        "    (_)     ",
-        "   (___)    ",
-        "   _|_|_    ",
-        "  (_____)   "
-    },{
-        "    |\\_     ",
-        "   /  .\\_   ",
-        "  |   ___)  ",
-        "   \\ = |    ",
-        "   /____\\   ",
-        "  [______]  "
-    },{
-        "     _0     ",
-        "   / //\\    ",
-        "  {     }   ",
-        "   \\   /    ",
-        "   _|_|_    ",
-        "  (_____)   "
-    },{
-        "  __  _  _  ",
-        " |________| ",
-        " \\__ ____ / ",
-        "  |____|_|  ",
-        "  |__|___|  ",
-        " [________] "
-    },{
-        "    _()_    ",
-        "  _/____\\_  ",
-        "  \\______/  ",
-        "   (____)   ",
-        "    |__|    ",
-        "  (______)  "
-    },{
-        "    _++_    ",
-        "  _/____\\_  ",
-        "  \\______/  ",
-        "   (____)   ",
-        "    |__|    ",
-        "  (______)  "
-    }
-};
 
 void draw_splash_screen(WINDOW * win);
 

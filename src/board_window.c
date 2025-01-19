@@ -1,6 +1,8 @@
 #include "graphics.h"
 #include "move_gen/bitboard.h"
 
+const char piece_art[6][SQUARE_HEIGHT][SQUARE_WIDTH + 1];
+
 typedef enum {
     UNSELECTED,
     PIECE_SELECTED
@@ -124,3 +126,49 @@ bool check_move_invalid(Board * board, uint16_t move){
     }unmake_move(board, move);
     return false;
 }
+
+const char piece_art[6][SQUARE_HEIGHT][SQUARE_WIDTH + 1] = {
+    {
+        "            ",
+        "     _      ",
+        "    (_)     ",
+        "   (___)    ",
+        "   _|_|_    ",
+        "  (_____)   "
+    },{
+        "    |\\_     ",
+        "   /  .\\_   ",
+        "  |   ___)  ",
+        "   \\ = |    ",
+        "   /____\\   ",
+        "  [______]  "
+    },{
+        "     _0     ",
+        "   / //\\    ",
+        "  {     }   ",
+        "   \\   /    ",
+        "   _|_|_    ",
+        "  (_____)   "
+    },{
+        "  __  _  _  ",
+        " |________| ",
+        " \\__ ____ / ",
+        "  |____|_|  ",
+        "  |__|___|  ",
+        " [________] "
+    },{
+        "    _()_    ",
+        "  _/____\\_  ",
+        "  \\______/  ",
+        "   (____)   ",
+        "    |__|    ",
+        "  (______)  "
+    },{
+        "    _++_    ",
+        "  _/____\\_  ",
+        "  \\______/  ",
+        "   (____)   ",
+        "    |__|    ",
+        "  (______)  "
+    }
+};
