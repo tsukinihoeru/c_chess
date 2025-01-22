@@ -148,3 +148,15 @@ uint64_t perft(Board *board, int depth){
         unmake_move(board, move_list[i]);
     }return nodes;
 }
+
+int is_checkmate(Board *board){
+    uint16_t move_list[256];
+    int num_moves = generate_moves(board, move_list);
+    for(int i = 0; i < num_moves; i++){
+        make_move(board, move_list[i]);
+        if(!move_invalid(board, move_list[i])){
+            unmake_move(board, move_list[i]);
+            return 0;
+        }unmake_move(board, move_list[i]);
+    }return 1;
+}

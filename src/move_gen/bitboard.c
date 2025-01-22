@@ -268,3 +268,12 @@ void init_magics(){
         free(occupancy_boards);
     }
 }
+
+//returns if side to move is in check
+int position_in_check(Board *board){
+    board->side_to_move = !board->side_to_move;
+    int king_pos = __builtin_ctzll(board->bitboards[KING_BOARD] & board->bitboards[!board->side_to_move]);
+    int in_check = square_attacked(board, king_pos);
+    board->side_to_move = !board->side_to_move;
+    return in_check;
+}

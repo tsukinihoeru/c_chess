@@ -37,6 +37,8 @@ bool point_in_window(WINDOW *win, int px, int py){
     int size_x, size_y;
     getbegyx(win, beg_y, beg_x);
     getmaxyx(win, size_y, size_x);
+    mvprintw(51, 0, "bx: %d, by: %d, size_x %d, size y %d, mouse x: %d, mouse y: %d", beg_x, beg_y, size_x, size_y, px, py);
+    refresh();
     return px >= beg_x && px < beg_x + size_x && py >= beg_y && py < beg_y + size_y;
 }
 

@@ -33,10 +33,12 @@ typedef struct Board {
 void init_magics();
 int generate_moves(Board *board, uint16_t * move_list);
 int square_attacked(Board *board, int square);
+int is_checkmate(Board *board);
 
 void make_move(Board *board, uint16_t move);
 void unmake_move(Board *board, uint16_t move);
 int move_invalid(Board *board, uint16_t move);
+int position_in_check(Board *board);
 
 void parse_board(Board *board, char *fen);
 void clear_board(Board *board);
@@ -46,5 +48,7 @@ void print_board(Board *board);
 void print_move(uint16_t move);
 void print_u64(uint64_t board);
 uint64_t perft(Board *board, int depth);
+
+void get_move_pgn(Board *board, uint16_t move, char * pgn);
 
 #endif

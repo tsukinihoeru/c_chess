@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <assert.h>
+#include "../move_gen/bitboard.h"
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
@@ -11,9 +12,12 @@ static const int SQUARE_WIDTH = 12;
 static const int BOARD_HPAD = 2;
 static const int BOARD_VPAD = 2;
 
+extern char STARTING_POSITION_FEN[];
+
 //graphics.c functions
 void init_graphics();
 void init_colors();
+void init_all_windows();
 
 bool point_in_window(WINDOW *win, int px, int py);
 int cursor_to_window_x(int cposx);
@@ -21,12 +25,15 @@ int cursor_to_window_y(int cposy);
 void set_highlighted_square(int square);
 
 //board_window functions
-void init_board_win(WINDOW *win);
+void init_board_win();
+WINDOW* get_board_win();
+Board* get_board_ptr();
 void receive_input(int win_x, int win_y);
 void draw_board();
 bool square_highlighted(int square);
 
 //move_history functions
+void init_move_history();
 void reset_move_history();
 bool can_undo_move();
 bool can_redo_move();

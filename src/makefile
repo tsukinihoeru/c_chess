@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall -Wextra
 LDLIBS = -lncurses
 objects = main.o
-move_gen_objects = move_gen/bitboard_util.o move_gen/bitboard.o move_gen/make_move.o 
+move_gen_objects = move_gen/bitboard_util.o move_gen/bitboard.o move_gen/make_move.o move_gen/pgn_parser.o
 graphics_objects = graphics/graphics.o graphics/buttons.o graphics/board_window.o graphics/colors.o graphics/move_history.o
 SUBDIRS = move_gen graphics
 

@@ -1,5 +1,4 @@
 #include "graphics.h"
-#include "../move_gen/bitboard.h"
 
 const char piece_art[6][SQUARE_HEIGHT][SQUARE_WIDTH + 1];
 
@@ -8,13 +7,13 @@ typedef enum {
     PIECE_SELECTED
 } Board_State;
 
-FILE *debug_log;
-
 WINDOW *board_win;
 Board board;
 int selected_square;
 bool target_squares[64]; //the squares that the selected piece can attack
 Board_State state;
+
+char STARTING_POSITION_FEN[] = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq";
 
 int get_square_color(int piece, int i, int j);
 void clear_highlights();
@@ -23,24 +22,26 @@ void set_target_squares(int square);
 void try_make_move(int from, int to);
 bool check_move_invalid(Board * board, uint16_t move);
 
-void init_board_win(WINDOW *win){
-    debug_log = fopen("log.txt", "w");
-    board_win = win;
+void init_board_win(){
     board_win = newwin(8 * SQUARE_HEIGHT, 8 * SQUARE_WIDTH, BOARD_VPAD, BOARD_HPAD);
     init_magics();
-    char opening_fen[] = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq";
-    parse_board(&board, opening_fen);
+    parse_board(&board, STARTING_POSITION_FEN);
     clear_highlights();
     state = UNSELECTED;
-    fprintf(debug_log, "JUST SHOW IT GOD DAMN IT \n");
+}
+
+WINDOW* get_board_win(){
+    return board_win;
+}
+
+Board* get_board_ptr(){
+    return &board;
 }
 
 void receive_input(int win_x, int win_y){ //win_x and win_y are window relative coordinates
-    fprintf(debug_log, "received click... \n");
     int square = (7 - (win_y)/SQUARE_HEIGHT) * 8 + win_x / SQUARE_WIDTH;
     if(square < 0 || square > 63)
         return;
-    fprintf(debug_log, "received click on square: %d\n", square);
     if(state == UNSELECTED){
         select_piece(square);
     }else if(state == PIECE_SELECTED){
@@ -113,6 +114,7 @@ void try_make_move(int from, int to){
         int dest = (move_list[i] >> 4) & 0x3f;
         if(from == source && to == dest){
             make_move(&board, move_list[i]);
+            append_move(move_list[i]);
             return;
         }
     }

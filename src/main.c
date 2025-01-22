@@ -4,13 +4,12 @@
 char str [80];
 
 int main() {
-    
-    WINDOW *board_win = NULL;
     MEVENT event;
     int c;
     // char str [80];
     init_graphics();
-    init_board_win(board_win);
+    init_board_win();
+    init_move_history();
     draw_board();
     while (1) {
         //refresh();
@@ -18,8 +17,13 @@ int main() {
         if (c == KEY_MOUSE) {
             if (getmouse(&event) == OK) {
                 if (event.bstate & BUTTON1_CLICKED) {
-                    receive_input(cursor_to_window_x(event.x), cursor_to_window_y(event.y));
-                    draw_board();
+                    if(point_in_window(get_board_win(), event.x, event.y)){
+                        mvprintw(51, 0, "Inside");
+                        receive_input(cursor_to_window_x(event.x), cursor_to_window_y(event.y));
+                        draw_board();
+                    }else{
+                        mvprintw(51, 0, "Outside");
+                    }
                     //set_highlighted_square(cursor_to_square_index(event.x, event.y));
                     //draw_board(board_win, board.mailbox);
                 }
