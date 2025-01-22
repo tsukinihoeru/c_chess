@@ -13,7 +13,7 @@ int selected_square;
 bool target_squares[64]; //the squares that the selected piece can attack
 Board_State state;
 
-char STARTING_POSITION_FEN[] = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq";
+char STARTING_POSITION_FEN[] = "8/R7/RBk2B2/R7/8/8/1B6/7K w - - 0 1";
 
 int get_square_color(int piece, int i, int j);
 void clear_highlights();

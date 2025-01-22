@@ -58,17 +58,19 @@ void print_move_history(){
     Board board;
     int line_length = 0;
     parse_board(&board, STARTING_POSITION_FEN);
+    wprintw(history_window, "\n");
     for(int i = 0; i < history_size; i++){
         get_move_pgn(&board, move_history[i], pgn_string);
         make_move(&board, move_history[i]);
-        if(line_length + 1 + strnlen(pgn_string, 10) >= WIDTH){
+        if(line_length + strnlen(pgn_string, 10) >= WIDTH){
             line_length = 1 + strnlen(pgn_string, 10);
             wprintw(history_window, "\n");
         }else{
             line_length += 1 + strnlen(pgn_string, 10);
         }
-        wprintw(history_window, "%s ", pgn_string);
+        wprintw(history_window, " %s", pgn_string);
     }
+    box(history_window, 0, 0);
     wrefresh(history_window);
     refresh();
 }

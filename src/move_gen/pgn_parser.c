@@ -1,9 +1,9 @@
 #include "bitboard.h"
 
 const char pgn_piece_convert[8] = {'0', '1', '2', 'N', 'B', 'R', 'Q', 'K'};
+
 //returns length of string, stores pgn string in char*pgn
 //called BEFORE the move is made
-//missing disambiguation, so annoying to implement
 void get_move_pgn(Board *board, uint16_t move, char * pgn){
     int source = (move >> 10) & 0x3f;
     int dest = (move >> 4) & 0x3f;
@@ -23,8 +23,32 @@ void get_move_pgn(Board *board, uint16_t move, char * pgn){
         *pgn++ = '\0';
         return;
     }
-    if(piece != PAWN_BOARD)
+    if(piece != PAWN_BOARD){
         *pgn++ = pgn_piece_convert[piece];
+        //disambiguation:
+        uint16_t move_list[256];
+        int num_moves = generate_moves(board, move_list);
+        int dismabiguated_file = 0;
+        int disambiguated_column = 0;
+        char char_file = '0';
+        char char_column = '0';
+        for(int i = 0; i < num_moves; i++){
+            int nsource = (move_list[i] >> 10) & 0x3f;
+            int ndest = (move_list[i] >> 4) & 0x3f;
+            if(source != nsource && dest == ndest && board->mailbox[source] == board->mailbox[nsource]){
+                if(source % 8 != nsource % 8 && !dismabiguated_file){
+                    dismabiguated_file = 1;
+                    char_file = source % 8 + 'a';
+                }else if(source / 8 != nsource && source % 8 == nsource % 8 && !disambiguated_column){
+                    char_column = source / 8 + '1';
+                    disambiguated_column = 1;
+                }
+            }
+        }if(dismabiguated_file)
+            *pgn++ = char_file;
+        if(disambiguated_column)
+            *pgn++ = char_column;
+    }
     else
         *pgn++ = source % 8 + 'a';
     if(flag & 0b0100){
