@@ -49,6 +49,7 @@ void draw_buttons();
 void init_buttons();
 void click_undo();
 void click_redo();
+void button_receive_input(int cursor_x, int cursor_y);
 
 
 //test functions (delete later)

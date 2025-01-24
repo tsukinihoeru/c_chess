@@ -20,10 +20,9 @@ int main() {
             if (getmouse(&event) == OK) {
                 if (event.bstate & BUTTON1_CLICKED) {
                     if(point_in_window(get_board_win(), event.x, event.y)){
-                        mvprintw(51, 0, "Inside");
                         board_receive_input(cursor_to_window_x(event.x), cursor_to_window_y(event.y));
                     }else{
-                        mvprintw(51, 0, "Outside");
+                        button_receive_input(event.x, event.y);
                     }
                     //set_highlighted_square(cursor_to_square_index(event.x, event.y));
                     //draw_board(board_win, board.mailbox);
