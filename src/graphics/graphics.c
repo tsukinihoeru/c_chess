@@ -17,6 +17,11 @@ void init_graphics(){
     refresh();
 }
 
+void draw_all(){
+    draw_board();
+    draw_move_history();
+}
+
 static const char splash_message[] = ">Press Any Key to Continue<";
 
 void draw_splash_screen(WINDOW * win){

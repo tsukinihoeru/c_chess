@@ -24,15 +24,18 @@ int cursor_to_window_x(int cposx);
 int cursor_to_window_y(int cposy);
 void set_highlighted_square(int square);
 
+void draw_all();
+
 //board_window functions
 void init_board_win();
 WINDOW* get_board_win();
 Board* get_board_ptr();
-void receive_input(int win_x, int win_y);
+void board_receive_input(int win_x, int win_y);
 void draw_board();
 bool square_highlighted(int square);
 
 //move_history functions
+void draw_move_history();
 void init_move_history();
 void reset_move_history();
 bool can_undo_move();
@@ -40,6 +43,12 @@ bool can_redo_move();
 uint16_t undo_move();
 uint16_t redo_move();
 void append_move(uint16_t move);
+
+//button functions
+void draw_buttons();
+void init_buttons();
+void click_undo();
+void click_redo();
 
 
 //test functions (delete later)

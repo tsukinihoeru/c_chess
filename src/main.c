@@ -10,7 +10,9 @@ int main() {
     init_graphics();
     init_board_win();
     init_move_history();
+    init_buttons();
     draw_board();
+    draw_buttons();
     while (1) {
         //refresh();
         c = getch();
@@ -19,8 +21,7 @@ int main() {
                 if (event.bstate & BUTTON1_CLICKED) {
                     if(point_in_window(get_board_win(), event.x, event.y)){
                         mvprintw(51, 0, "Inside");
-                        receive_input(cursor_to_window_x(event.x), cursor_to_window_y(event.y));
-                        draw_board();
+                        board_receive_input(cursor_to_window_x(event.x), cursor_to_window_y(event.y));
                     }else{
                         mvprintw(51, 0, "Outside");
                     }
@@ -28,6 +29,7 @@ int main() {
                     //draw_board(board_win, board.mailbox);
                 }
             }
+            draw_all();
         }else if(c == 'q'){
             mvprintw(51, 0, "Bitch");
         } 
@@ -40,6 +42,12 @@ int main() {
             exit_curses_get_fen_input(str, 80);
             mvprintw(51, 0, "%s", str);
             refresh();
+        }else if(c == KEY_LEFT){
+            click_undo();
+            draw_all();
+        }else if(c == KEY_RIGHT){
+            click_redo();
+            draw_all();
         }
         else{
             mvprintw(51, 0, "Getch %d   %d", c, KEY_MOUSE);

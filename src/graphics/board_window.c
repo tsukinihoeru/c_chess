@@ -13,7 +13,7 @@ int selected_square;
 bool target_squares[64]; //the squares that the selected piece can attack
 Board_State state;
 
-char STARTING_POSITION_FEN[] = "8/R7/RBk2B2/R7/8/8/1B6/7K w - - 0 1";
+char STARTING_POSITION_FEN[] = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
 int get_square_color(int piece, int i, int j);
 void clear_highlights();
@@ -38,7 +38,7 @@ Board* get_board_ptr(){
     return &board;
 }
 
-void receive_input(int win_x, int win_y){ //win_x and win_y are window relative coordinates
+void board_receive_input(int win_x, int win_y){ //win_x and win_y are window relative coordinates
     int square = (7 - (win_y)/SQUARE_HEIGHT) * 8 + win_x / SQUARE_WIDTH;
     if(square < 0 || square > 63)
         return;
