@@ -2,17 +2,17 @@
 #include "../move_gen/bitboard.h"
 #include <string.h>
 
+const int MAX_PGN_LENGTH = 2000;
+
 uint16_t move_history[500];
 int history_size;
 int cur_move_ind; //current means the move that will be played, not the last played move
 WINDOW* history_window;
 const int HPAD = 100;
-const int VPAD = 2;
+const int VPAD = 1;
 const int WIDTH = 50;
 const int HEIGHT = 40;
 int BLACK_FIRST_MOVE = 0; //if black was first to move
-
-void print_move_history();
 
 void init_move_history(){
     history_size = 0;
@@ -81,7 +81,7 @@ void draw_move_history(){
         if(i % 2 == 0){
             int move_number = i/2 + 1;
             int m_num_length = move_number / 10 + 3;
-            if(line_length + strnlen(pgn_string, 10) + m_num_length >= WIDTH){
+            if(line_length + strnlen(pgn_string, 10) + m_num_length + 1 >= WIDTH){
                 line_length = m_num_length + strnlen(pgn_string, 10);
                 wprintw(history_window, "\n");
             }
@@ -94,7 +94,7 @@ void draw_move_history(){
             wattroff(history_window, A_UNDERLINE);
         }
         else{
-            if(line_length + strnlen(pgn_string, 10) >= WIDTH){
+            if(line_length + strnlen(pgn_string, 10) + 1 >= WIDTH){
                 line_length = 1 + strnlen(pgn_string, 10);
                 wprintw(history_window, "\n");
             }else{
@@ -110,4 +110,24 @@ void draw_move_history(){
     box(history_window, 0, 0);
     wrefresh(history_window);
     refresh();
+}
+
+//ASSUMES THE PGN IS VALID
+void import_pgn(char *pgn){
+    char pgn_copy[MAX_PGN_LENGTH];
+    strncpy(pgn_copy, pgn, MAX_PGN_LENGTH);
+    parse_board(get_board_ptr(), STANDARD_STARTING_POS_FEN);
+    reset_move_history();
+
+    char *token = strtok(pgn_copy, " ");
+    while(token){
+        if(token[0] > '9'){
+            uint16_t move = pgn_to_move(get_board_ptr(), token);
+            if(!move)
+                return;
+            append_move(move);
+            make_move(get_board_ptr(), move);
+        }
+        token = strtok(NULL, " ");
+    }
 }

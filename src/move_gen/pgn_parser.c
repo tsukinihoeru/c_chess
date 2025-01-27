@@ -1,4 +1,5 @@
 #include "bitboard.h"
+#include <string.h>
 
 const char pgn_piece_convert[8] = {'0', '1', '2', 'N', 'B', 'R', 'Q', 'K'};
 
@@ -66,4 +67,17 @@ void get_move_pgn(Board *board, uint16_t move, char * pgn){
     }
     unmake_move(board, move);
     *pgn++ = '\0';
+}
+
+//returns null move if move not found
+uint16_t pgn_to_move(Board *board, char *pgn_token){
+    char move_pgn[10];
+    uint16_t move_list[256];
+    int num_moves = generate_moves(board, move_list);
+    for(int i = 0; i < num_moves; i++){
+        get_move_pgn(board, move_list[i], move_pgn);
+        if(strncmp(move_pgn, pgn_token, 10) == 0){
+            return move_list[i];
+        }
+    }return 0;
 }

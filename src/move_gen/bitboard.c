@@ -277,3 +277,17 @@ int position_in_check(Board *board){
     board->side_to_move = !board->side_to_move;
     return in_check;
 }
+
+void copy_board(Board *src, Board *dest){
+    dest->side_to_move = src ->side_to_move;
+    dest->ply = src->ply;
+    for(int i = 0; i < 400; i++){
+        dest->history[i].captured_piece =  src->history[i].captured_piece;
+        dest->history[i].castling_rights =  src->history[i].castling_rights;
+        dest->history[i].en_passant_square =  src->history[i].en_passant_square;
+    }for(int i = 0; i < 64; i++){
+        dest->mailbox[i] = src->mailbox[i];
+    }for(int i = 0; i < 8; i++){
+        dest->bitboards[i] = src->bitboards[i];
+    }
+}

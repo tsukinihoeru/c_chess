@@ -13,8 +13,8 @@ int selected_square;
 bool target_squares[64]; //the squares that the selected piece can attack
 Board_State state;
 
-char STARTING_POSITION_FEN[] = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-
+char STARTING_POSITION_FEN[65] = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+char STANDARD_STARTING_POS_FEN[65] = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 int get_square_color(int piece, int i, int j);
 void clear_highlights();
 void select_piece(int square);
@@ -28,6 +28,21 @@ void init_board_win(){
     parse_board(&board, STARTING_POSITION_FEN);
     clear_highlights();
     state = UNSELECTED;
+}
+
+void set_board_win(char *fen){
+    parse_board(&board, fen);
+    clear_highlights();
+    state = UNSELECTED;
+    int i = 0;
+    for(; fen[i] != '\0'; i++){
+        STARTING_POSITION_FEN[i] = fen[i];
+    }STARTING_POSITION_FEN[i] = '\0';
+}
+
+void set_board_win_from_pgn(Board *other_board){
+    set_board_win(STANDARD_STARTING_POS_FEN);
+    copy_board(other_board, &board);
 }
 
 WINDOW* get_board_win(){

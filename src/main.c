@@ -1,6 +1,7 @@
 #include "move_gen/bitboard.h"
 #include "graphics/graphics.h"
 #include <time.h> 
+#include <stdlib.h>
 char str [80];
 
 int main() {
@@ -29,18 +30,9 @@ int main() {
                 }
             }
             draw_all();
-        }else if(c == 'q'){
-            mvprintw(51, 0, "Bitch");
-        } 
-        else if(c == 'w'){
-            mvprintw(51, 0, "Witch");
         }
         else if (c == 10 || c == 'a') {
-            break;
-        }else if( c == 'p'){
-            exit_curses_get_fen_input(str, 80);
-            mvprintw(51, 0, "%s", str);
-            refresh();
+            click_exit();
         }else if(c == KEY_LEFT){
             click_undo();
             draw_all();

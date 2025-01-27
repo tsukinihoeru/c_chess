@@ -10,9 +10,11 @@
 static const int SQUARE_HEIGHT = 6;
 static const int SQUARE_WIDTH = 12;
 static const int BOARD_HPAD = 2;
-static const int BOARD_VPAD = 2;
+static const int BOARD_VPAD = 1;
 
 extern char STARTING_POSITION_FEN[];
+extern char STANDARD_STARTING_POS_FEN[];
+extern const int MAX_PGN_LENGTH;
 
 //graphics.c functions
 void init_graphics();
@@ -28,6 +30,8 @@ void draw_all();
 
 //board_window functions
 void init_board_win();
+void set_board_win(char *fen);
+void set_board_win_from_pgn(Board *other_board);
 WINDOW* get_board_win();
 Board* get_board_ptr();
 void board_receive_input(int win_x, int win_y);
@@ -38,6 +42,7 @@ bool square_highlighted(int square);
 void draw_move_history();
 void init_move_history();
 void reset_move_history();
+void import_pgn(char *pgn);
 bool can_undo_move();
 bool can_redo_move();
 uint16_t undo_move();
@@ -49,11 +54,8 @@ void draw_buttons();
 void init_buttons();
 void click_undo();
 void click_redo();
+void click_exit();
 void button_receive_input(int cursor_x, int cursor_y);
-
-
-//test functions (delete later)
-void exit_curses_get_fen_input(char *str, int lim);
 
 void draw_splash_screen(WINDOW * win);
 
