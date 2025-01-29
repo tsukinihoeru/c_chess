@@ -1,6 +1,7 @@
 #include "graphics.h"
 #include "../move_gen/bitboard.h"
 #include <string.h>
+#include <math.h>
 
 const int MAX_PGN_LENGTH = 2000;
 
@@ -68,6 +69,14 @@ void concat_str(char *s, char *t){
     }*s = '\0';
 }
 
+int num_digits(int num){
+    int count = 0;
+    while(num){
+        num /= 10;
+        count++;
+    }return count;
+}
+
 void draw_move_history(){
     werase(history_window);
     char pgn_string[20];
@@ -80,8 +89,8 @@ void draw_move_history(){
         make_move(&board, move_history[i]);
         if(i % 2 == 0){
             int move_number = i/2 + 1;
-            int m_num_length = move_number / 10 + 3;
-            if(line_length + strnlen(pgn_string, 10) + m_num_length + 1 >= WIDTH){
+            int m_num_length = num_digits(move_number) + 2;
+            if(line_length + strnlen(pgn_string, 10) + m_num_length>= WIDTH){
                 line_length = m_num_length + strnlen(pgn_string, 10);
                 wprintw(history_window, "\n");
             }
@@ -94,7 +103,7 @@ void draw_move_history(){
             wattroff(history_window, A_UNDERLINE);
         }
         else{
-            if(line_length + strnlen(pgn_string, 10) + 1 >= WIDTH){
+            if(line_length + strnlen(pgn_string, 10) >= WIDTH){
                 line_length = 1 + strnlen(pgn_string, 10);
                 wprintw(history_window, "\n");
             }else{
