@@ -1,4 +1,5 @@
 #include "graphics.h"
+#include "../engine/evaluate.h"
 
 const char piece_art[6][SQUARE_HEIGHT][SQUARE_WIDTH + 1];
 
@@ -85,6 +86,8 @@ void draw_board(){
         }
     }
     wrefresh(board_win);
+    int eval = simple_evaluate(&board);
+    mvprintw(51, 0, "Current position eval is %d.", eval);
     refresh();
 }
 

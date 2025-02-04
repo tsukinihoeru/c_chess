@@ -1,10 +1,11 @@
-CC = gcc
+CC = g++
 CFLAGS = -Wall -Wextra
 LDLIBS = -lncurses
 objects = main.o
 move_gen_objects = move_gen/bitboard_util.o move_gen/bitboard.o move_gen/make_move.o move_gen/pgn_parser.o
 graphics_objects = graphics/graphics.o graphics/buttons.o graphics/board_window.o graphics/colors.o graphics/move_history.o
-SUBDIRS = move_gen graphics
+engine_objects = engine/simple_evaluate.o engine/search.o
+SUBDIRS = move_gen graphics engine
 
 all : $(objects)
 	@for subdir in $(SUBDIRS); do \
@@ -12,7 +13,7 @@ all : $(objects)
         cd $$subdir && $(MAKE) all; \
 		cd ..; \
     done
-	$(CC) -o out $(objects) $(move_gen_objects) $(graphics_objects) $(LDLIBS)
+	$(CC) -o out $(objects) $(move_gen_objects) $(graphics_objects) $(engine_objects) $(LDLIBS)
 
 main.o : move_gen/bitboard.h graphics/graphics.h
 

@@ -15,6 +15,41 @@ void init_graphics(){
     keypad(stdscr, 1);
     mousemask(ALL_MOUSE_EVENTS, NULL);
     refresh();
+    init_board_win();
+    init_move_history();
+    init_buttons();
+    draw_board();
+    draw_buttons();
+}
+
+void start_game_loop(){
+    MEVENT event;
+    int c;
+    while (1) {
+        c = getch();
+        if (c == KEY_MOUSE) {
+            if (getmouse(&event) == OK) {
+                if (event.bstate & BUTTON1_CLICKED) {
+                    if(point_in_window(get_board_win(), event.x, event.y)){
+                        board_receive_input(cursor_to_window_x(event.x), cursor_to_window_y(event.y));
+                    }else{
+                        button_receive_input(event.x, event.y);
+                    }
+                }
+            }
+            draw_all();
+        }
+        else if (c == 10 || c == 'a') {
+            click_exit();
+        }else if(c == KEY_LEFT){
+            click_undo();
+            draw_all();
+        }else if(c == KEY_RIGHT){
+            click_redo();
+            draw_all();
+        }
+    }
+    endwin();
 }
 
 void draw_all(){
@@ -42,7 +77,6 @@ bool point_in_window(WINDOW *win, int px, int py){
     int size_x, size_y;
     getbegyx(win, beg_y, beg_x);
     getmaxyx(win, size_y, size_x);
-    mvprintw(51, 0, "bx: %d, by: %d, size_x %d, size y %d, mouse x: %d, mouse y: %d", beg_x, beg_y, size_x, size_y, px, py);
     refresh();
     return px >= beg_x && px < beg_x + size_x && py >= beg_y && py < beg_y + size_y;
 }

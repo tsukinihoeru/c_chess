@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <ncurses.h>
 #include <time.h>
 #include <stdbool.h>
@@ -19,7 +23,7 @@ extern const int MAX_PGN_LENGTH;
 //graphics.c functions
 void init_graphics();
 void init_colors();
-void init_all_windows();
+void start_game_loop();
 
 bool point_in_window(WINDOW *win, int px, int py);
 int cursor_to_window_x(int cposx);
@@ -82,4 +86,8 @@ static const char splash_screen_art[17][55] = {
     "                    /                                 "
 };
 
+#endif
+
+#ifdef __cplusplus
+} // closing brace for extern "C"
 #endif

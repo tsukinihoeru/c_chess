@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <ctype.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -53,4 +57,8 @@ uint64_t perft(Board *board, int depth);
 void get_move_pgn(Board *board, uint16_t move, char * pgn);
 uint16_t pgn_to_move(Board *board, char *pgn_token);
 
+#endif
+
+#ifdef __cplusplus
+} // closing brace for extern "C"
 #endif
