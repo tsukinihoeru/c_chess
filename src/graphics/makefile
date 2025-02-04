@@ -1,4 +1,4 @@
-CC = gcc
+CC = g++
 CFLAGS = -Wall -Wextra
 objects = graphics.o buttons.o board_window.o colors.o move_history.o
 

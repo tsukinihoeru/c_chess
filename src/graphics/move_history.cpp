@@ -77,6 +77,8 @@ int num_digits(int num){
     }return count;
 }
 
+
+//TODO: change so it uses std::string instead of c string
 void draw_move_history(){
     werase(history_window);
     char pgn_string[20];

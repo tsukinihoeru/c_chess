@@ -20,8 +20,8 @@ uint16_t Engine::root_search(int alpha, int beta, int depth){
             best_move = move_list[i];
             alpha = move_score;
         }
-        print_move(move_list[i]);
-        std::cout << " Score: " << alpha << "\n";
+        //print_move(move_list[i]);
+        //std::cout << " Score: " << alpha << "\n";
     }
     return best_move;
 }

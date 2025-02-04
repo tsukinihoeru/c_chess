@@ -41,6 +41,7 @@ Board* get_board_ptr();
 void board_receive_input(int win_x, int win_y);
 void draw_board();
 bool square_highlighted(int square);
+uint16_t get_engine_move();
 
 //move_history functions
 void draw_move_history();

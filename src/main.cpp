@@ -4,15 +4,16 @@
 
 
 int main() {
-    //init_graphics();
-    //start_game_loop();
+    init_graphics();
+    start_game_loop();
+    /*
     init_magics();
     Engine engine;
     Board board;
     engine.board = &board;
     char fen[] = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     parse_board(engine.board, fen);
-    print_move(engine.root_search(-10000000, 10000000, 7));
+    print_move(engine.root_search(-10000000, 10000000, 7));*/
     return 0;
 }
 

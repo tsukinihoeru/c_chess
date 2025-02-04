@@ -1,7 +1,51 @@
 #include "graphics.h"
-#include "../engine/evaluate.h"
+#include "../engine/engine.h"
 
-const char piece_art[6][SQUARE_HEIGHT][SQUARE_WIDTH + 1];
+const char piece_art[6][SQUARE_HEIGHT][SQUARE_WIDTH + 1] = {
+    {
+        "            ",
+        "     _      ",
+        "    (_)     ",
+        "   (___)    ",
+        "   _|_|_    ",
+        "  (_____)   "
+    },{
+        "    |\\_     ",
+        "   /  .\\_   ",
+        "  |   ___)  ",
+        "   \\ = |    ",
+        "   /____\\   ",
+        "  [______]  "
+    },{
+        "     _0     ",
+        "   / //\\    ",
+        "  {     }   ",
+        "   \\   /    ",
+        "   _|_|_    ",
+        "  (_____)   "
+    },{
+        "  __  _  _  ",
+        " |________| ",
+        " \\__ ____ / ",
+        "  |____|_|  ",
+        "  |__|___|  ",
+        " [________] "
+    },{
+        "    _()_    ",
+        "  _/____\\_  ",
+        "  \\______/  ",
+        "   (____)   ",
+        "    |__|    ",
+        "  (______)  "
+    },{
+        "    _++_    ",
+        "  _/____\\_  ",
+        "  \\______/  ",
+        "   (____)   ",
+        "    |__|    ",
+        "  (______)  "
+    }
+};
 
 typedef enum {
     UNSELECTED,
@@ -10,6 +54,7 @@ typedef enum {
 
 WINDOW *board_win;
 Board board;
+Engine window_engine;
 int selected_square;
 bool target_squares[64]; //the squares that the selected piece can attack
 Board_State state;
@@ -27,6 +72,7 @@ void init_board_win(){
     board_win = newwin(8 * SQUARE_HEIGHT, 8 * SQUARE_WIDTH, BOARD_VPAD, BOARD_HPAD);
     init_magics();
     parse_board(&board, STARTING_POSITION_FEN);
+    window_engine.board = &board;
     clear_highlights();
     state = UNSELECTED;
 }
@@ -86,8 +132,6 @@ void draw_board(){
         }
     }
     wrefresh(board_win);
-    int eval = simple_evaluate(&board);
-    mvprintw(51, 0, "Current position eval is %d.", eval);
     refresh();
 }
 
@@ -147,48 +191,6 @@ bool check_move_invalid(Board * board, uint16_t move){
     return false;
 }
 
-const char piece_art[6][SQUARE_HEIGHT][SQUARE_WIDTH + 1] = {
-    {
-        "            ",
-        "     _      ",
-        "    (_)     ",
-        "   (___)    ",
-        "   _|_|_    ",
-        "  (_____)   "
-    },{
-        "    |\\_     ",
-        "   /  .\\_   ",
-        "  |   ___)  ",
-        "   \\ = |    ",
-        "   /____\\   ",
-        "  [______]  "
-    },{
-        "     _0     ",
-        "   / //\\    ",
-        "  {     }   ",
-        "   \\   /    ",
-        "   _|_|_    ",
-        "  (_____)   "
-    },{
-        "  __  _  _  ",
-        " |________| ",
-        " \\__ ____ / ",
-        "  |____|_|  ",
-        "  |__|___|  ",
-        " [________] "
-    },{
-        "    _()_    ",
-        "  _/____\\_  ",
-        "  \\______/  ",
-        "   (____)   ",
-        "    |__|    ",
-        "  (______)  "
-    },{
-        "    _++_    ",
-        "  _/____\\_  ",
-        "  \\______/  ",
-        "   (____)   ",
-        "    |__|    ",
-        "  (______)  "
-    }
-};
+uint16_t get_engine_move(){
+    return window_engine.root_search(-10000000, 10000000, 5);
+}
