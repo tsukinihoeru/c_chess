@@ -1,6 +1,8 @@
 #include "graphics.h"
 #include "../move_gen/bitboard.h"
 #include <string.h>
+#include <string>
+#include <vector>
 #include <math.h>
 
 const int MAX_PGN_LENGTH = 2000;
@@ -79,7 +81,7 @@ int num_digits(int num){
 
 
 //TODO: change so it uses std::string instead of c string
-void draw_move_history(){
+void d_move_history(){
     werase(history_window);
     char pgn_string[20];
     Board board;
@@ -123,6 +125,64 @@ void draw_move_history(){
     refresh();
 }
 
+void draw_move_history(){
+    werase(history_window);
+    char pgn_string[20];
+    Board board;
+    parse_board(&board, STARTING_POSITION_FEN);
+    std::vector<std::string> str_list;
+    str_list.push_back("");
+    int cur_move_row = 0;
+    int cur_move_start = 0;
+    int cur_move_end = 0;
+    wprintw(history_window, "\n");
+    for(int i = 0; i < history_size; i++){
+        get_move_pgn(&board, move_history[i], pgn_string);
+        make_move(&board, move_history[i]);
+        if(i % 2 == 0){
+            int move_number = i/2 + 1;
+            int m_num_length = num_digits(move_number) + 2;
+            if(str_list.back().size() + strnlen(pgn_string, 10) + m_num_length>= WIDTH){
+                str_list.push_back("");
+            }str_list.back() += " " + std::to_string(move_number) + ".";
+            if(i == cur_move_ind - 1){
+                cur_move_row = str_list.size() - 1;
+                cur_move_start = str_list.back().size();
+            }
+            str_list.back().append(pgn_string);
+            if(i == cur_move_ind - 1){
+                cur_move_end = str_list.back().size();
+            }
+        }else{
+             if(str_list.back().size() + strnlen(pgn_string, 10) >= WIDTH){
+                str_list.push_back("");
+             }str_list.back() += " ";
+             if(i == cur_move_ind - 1){
+                cur_move_row = str_list.size() - 1;
+                cur_move_start = str_list.back().size();
+            }
+            str_list.back().append(pgn_string);
+            if(i == cur_move_ind - 1){
+                cur_move_end = str_list.back().size();
+            }
+        }
+    }for(int i = 0; i < str_list.size(); i++){
+        if(i == cur_move_row){
+            for(int j = 0; j < cur_move_start; j++){
+                mvwprintw(history_window, i + 1, j, "%c", str_list[i].at(j));
+            }wattron(history_window, A_UNDERLINE);
+            for(int j = cur_move_start; j < cur_move_end; j++){
+                mvwprintw(history_window, i + 1, j, "%c", str_list[i].at(j));
+            }wattroff(history_window, A_UNDERLINE);
+            for(int j = cur_move_end; j < str_list[i].size(); j++){
+                mvwprintw(history_window, i + 1, j, "%c", str_list[i].at(j));
+            }continue;
+        }
+        mvwprintw(history_window, i + 1, 0, "%s", str_list[i].c_str());
+    }box(history_window, 0, 0);
+    wrefresh(history_window);
+    refresh();
+}
 //ASSUMES THE PGN IS VALID
 void import_pgn(char *pgn){
     char pgn_copy[MAX_PGN_LENGTH];

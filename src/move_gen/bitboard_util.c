@@ -40,6 +40,7 @@ void clear_board(Board *board) {
     board->history[0].castling_rights = 0;
     board->history[0].en_passant_square = 0;
     board->history[0].captured_piece = 0;
+    board->zobrist_hash = 0;
 }
 
 //small helper function for parse_board
@@ -73,6 +74,7 @@ void parse_board(Board *board, char *fen) {
             board->side_to_move = WHITE;
         }else if(*fen == 'b'){
             board->side_to_move = BLACK;
+            board->zobrist_hash ^= color_hash;
         }else if(*fen == 'K'){
             board->history[board->ply].castling_rights |= WKS_CASTLING_RIGHTS;
         }else if(*fen == 'Q'){
@@ -89,6 +91,7 @@ void add_piece(Board *board, int piece, int square){
     board->bitboards[piece & 1] |= occupy_square[square];
     board->bitboards[piece >> 1] |= occupy_square[square];
     board->mailbox[square] = piece;
+    board->zobrist_hash ^= piece_hash[piece][square];
 }
 
 const char square[64][3] = {

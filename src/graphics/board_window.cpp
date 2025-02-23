@@ -71,6 +71,7 @@ bool check_move_invalid(Board * board, uint16_t move);
 void init_board_win(){
     board_win = newwin(8 * SQUARE_HEIGHT, 8 * SQUARE_WIDTH, BOARD_VPAD, BOARD_HPAD);
     init_magics();
+    init_zobrist_keys();
     parse_board(&board, STARTING_POSITION_FEN);
     window_engine.board = &board;
     clear_highlights();
@@ -175,11 +176,15 @@ void try_make_move(int from, int to){
         int source = (move_list[i] >> 10) & 0x3f;
         int dest = (move_list[i] >> 4) & 0x3f;
         if(from == source && to == dest){
-            make_move(&board, move_list[i]);
-            append_move(move_list[i]);
+           official_make_move(move_list[i]);
             return;
         }
     }
+}
+
+void official_make_move(uint16_t move){
+    make_move(&board, move);
+    append_move(move);
 }
 
 bool check_move_invalid(Board * board, uint16_t move){
@@ -192,5 +197,5 @@ bool check_move_invalid(Board * board, uint16_t move){
 }
 
 uint16_t get_engine_move(){
-    return window_engine.root_search(-10000000, 10000000, 5);
+    return window_engine.iterative_deepening(7);
 }

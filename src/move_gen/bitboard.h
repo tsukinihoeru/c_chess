@@ -20,6 +20,11 @@ extern const int QUIET_FLAG, DOUBLE_PUSH_FLAG, KS_CASTLE_FLAG, QS_CASTLE_FLAG, C
 extern const int WKS_CASTLING_RIGHTS, WQS_CASTLING_RIGHTS, BKS_CASTLING_RIGHTS, BQS_CASTLING_RIGHTS;
 extern const uint64_t occupy_square[64];
 
+extern uint64_t piece_hash[16][64];
+extern uint64_t castling_hash[16];
+extern uint64_t color_hash;
+extern uint64_t en_passant_hash[40];
+
 typedef struct game_state{
     uint8_t castling_rights;
     int en_passant_square;
@@ -32,10 +37,13 @@ typedef struct Board {
     uint64_t bitboards[8];
     game_state history[400];
     int ply;
+    uint64_t zobrist_hash;
 } Board;
 
 void init_magics();
+void init_zobrist_keys();
 int generate_moves(Board *board, uint16_t * move_list);
+int generate_captures(Board *board, uint16_t * move_list);
 int square_attacked(Board *board, int square);
 int is_checkmate(Board *board);
 

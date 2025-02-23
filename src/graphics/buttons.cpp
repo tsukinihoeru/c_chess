@@ -1,4 +1,5 @@
 #include "graphics.h"
+#include "../engine/engine.h" //only for debugging last search score
 #include <stdlib.h>
 
 const int num_buttons = 6;
@@ -101,7 +102,8 @@ void click_engine(){
     int source = (move >> 10) & 0x3f;
     int dest = (move >> 4) & 0x3f;
     int flag = move & 0x0f;
-    mvprintw(51, 0, "%s%s%d", square[source], square[dest], flag);
+    mvprintw(51, 0, "%s%s%d score: %d    ", square[source], square[dest], flag, last_search_score);
+    official_make_move(move);
 }
 
 void exit_curses_get_input(char *str, char *message, int lim){

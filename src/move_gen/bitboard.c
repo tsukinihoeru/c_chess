@@ -291,3 +291,71 @@ void copy_board(Board *src, Board *dest){
         dest->bitboards[i] = src->bitboards[i];
     }
 }
+
+int generate_captures(Board *board, uint16_t * move_list){
+    uint16_t * og_list = move_list;
+    uint64_t b1, b2, b3;
+    int source;
+    int side = board->side_to_move;
+    uint64_t us = board->bitboards[side];
+    uint64_t them = board->bitboards[!side];
+    uint64_t occupied = us | them;
+    b1 = board->bitboards[PAWN_BOARD] & us;
+    b2 = side ? shift_left_down_one(b1) : shift_left_up_one(b1);
+    b2 &= them;
+    b3 = b2 & non_promotion_mask[side];
+    while(b3){
+        int dest = pop_lsb(&b3);
+        *move_list++ = ((dest + undo_left_capture[side]) << 10) | (dest << 4) | CAPTURE_FLAG;
+    }
+    b3 = b2 & promotion_rank[side];
+    while(b3){
+        int dest = pop_lsb(&b3);
+        move_list = add_promo_cap_moves(dest + undo_left_capture[side], dest, move_list);
+    }
+    b2 = side ? shift_right_down_one(b1) : shift_right_up_one(b1);
+    b2 &= them;
+    b3 = b2 & non_promotion_mask[side];
+    while(b3){
+        int dest = pop_lsb(&b3);
+        *move_list++ = ((dest + undo_right_capture[side]) << 10) | (dest << 4) | CAPTURE_FLAG;
+    }
+    b3 = b2 & promotion_rank[side];
+    while(b3){
+        int dest = pop_lsb(&b3);
+        move_list = add_promo_cap_moves(dest + undo_right_capture[side], dest, move_list);
+    }
+
+    //knight moves w lookup table
+    b1 = board->bitboards[KNIGHT_BOARD] & us;
+    while(b1){
+        source = pop_lsb(&b1);
+        b2 = knight_move_lookup[source];
+        move_list = add_moves(source, b2 & them, CAPTURE_FLAG, move_list);
+    }
+
+    //normal king moves w lookup, no loop cause u cant have multiple kings
+    b1 = board->bitboards[KING_BOARD] & us;
+    source = pop_lsb(&b1);
+    b2 = king_move_lookup[source];
+    move_list = add_moves(source, b2 & them, CAPTURE_FLAG, move_list);
+
+    //bishop moves
+    b1 = (board->bitboards[BISHOP_BOARD] | board->bitboards[QUEEN_BOARD]) & us;
+    while(b1){
+        source = pop_lsb(&b1);
+        b3 = ((occupied & bishop_occupancy_mask[source]) * bishop_magic[source]) >> bishop_magic_shift[source]; //magic_index
+        b2 = bishop_magic_ptrs[source][b3];
+        move_list = add_moves(source, b2 & them, CAPTURE_FLAG, move_list);
+    }
+    //rook moves
+    b1 = (board->bitboards[ROOK_BOARD] | board->bitboards[QUEEN_BOARD]) & us;
+    while(b1){
+        source = pop_lsb(&b1);
+        b3 = ((occupied & rook_occupancy_mask[source]) * rook_magic[source]) >> rook_magic_shift[source]; //magic_index
+        b2 = rook_magic_ptrs[source][b3];
+        move_list = add_moves(source, b2 & them, CAPTURE_FLAG, move_list);
+    }
+
+    return (int) (move_list - og_list);
+}
