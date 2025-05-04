@@ -88,6 +88,10 @@ void set_board_win(char *fen){
     }STARTING_POSITION_FEN[i] = '\0';
 }
 
+void reset_board_win(){
+    set_board_win(STANDARD_STARTING_POS_FEN);
+}
+
 void set_board_win_from_pgn(Board *other_board){
     set_board_win(STANDARD_STARTING_POS_FEN);
     copy_board(other_board, &board);

@@ -76,18 +76,30 @@ int Engine::search(int alpha, int beta, int depth, int ply, bool is_pv){
     if(tt_score != INVALID)
         return tt_score;
     for(int i = 0; i < num_moves; i++){
+        /*
+            Sort the moves either by tt-move first or by move heuristics
+        */
         if(tt_move && i == 0){
             sort_tt_move(move_list, num_moves, tt_move);
             best_move = tt_move;
         }else{
             sort_move(move_list, i, num_moves);
         }
+
+        /*
+            make the move, check if move is legal
+        */
         make_move(board, move_list[i]);
         if(move_invalid(board, move_list[i])){
             unmake_move(board, move_list[i]);
             continue;
         }
         legal_moves++;
+
+        /*
+            PVS Search, where the recursion is done
+            search non-pv moves with null window
+        */
         int move_score;
         if(is_pv && i == 0){
              move_score = -search(-beta, -alpha, depth - 1, ply + 1, is_pv);
@@ -98,6 +110,11 @@ int Engine::search(int alpha, int beta, int depth, int ply, bool is_pv){
             }
         }
         unmake_move(board, move_list[i]);
+
+        /*
+            update scores about the position
+            check for beta cutoff and raise alpha
+        */
         if(move_score >= beta){
             transposition_table.save_value(board->zobrist_hash, beta, depth, BETA_FLAG, move_list[i]);
             return beta;

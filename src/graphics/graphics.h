@@ -20,9 +20,14 @@ extern char STARTING_POSITION_FEN[];
 extern char STANDARD_STARTING_POS_FEN[];
 extern const int MAX_PGN_LENGTH;
 
+//start_menu.cpp
+void start();
+void start_menu_loop();
+
 //graphics.c functions
 void init_graphics();
 void init_colors();
+void start_analysis_loop();
 void start_game_loop();
 
 bool point_in_window(WINDOW *win, int px, int py);
@@ -35,6 +40,7 @@ void draw_all();
 //board_window functions
 void init_board_win();
 void set_board_win(char *fen);
+void reset_board_win();
 void set_board_win_from_pgn(Board *other_board);
 WINDOW* get_board_win();
 Board* get_board_ptr();
@@ -56,37 +62,19 @@ uint16_t redo_move();
 void append_move(uint16_t move);
 
 //button functions
-void draw_buttons();
+void draw_analysis_buttons();
+void draw_local_buttons();
 void init_buttons();
 void click_undo();
 void click_redo();
 void click_exit();
 void button_receive_input(int cursor_x, int cursor_y);
+void button_receive_input_game(int cursor_x, int cursor_y);
 
-void draw_splash_screen(WINDOW * win);
+void draw_splash_screen();
+void init_menu_options();
 
 static const int splash_screen_hpad = 20;
-
-static const char splash_screen_art_length = 17;
-static const char splash_screen_art[17][55] = {
-    "      # ###      /                                    ",
-    "    /  /###  / #/                                     ",
-    "   /  /  ###/  ##                                     ",
-    "  /  ##   ##   ##                                     ",
-    " /  ###        ##                                     ",
-    "##   ##        ##  /##      /##       /###     /###   ",
-    "##   ##        ## / ###    / ###     / #### / / #### /",
-    "##   ##        ##/   ###  /   ###   ##  ###/ ##  ###/ ",
-    "##   ##        ##     ## ##    ### ####     ####      ",
-    "##   ##        ##     ## ########    ###      ###     ",
-    "##  ##         ##     ## #######       ###      ###   ",
-    " ## #       /  ##     ## ##              ###      ### ",    
-    "  ###      /   ##     ## ####    /  /###  ## /###  ## ",
-    "   ######/     ##     ##  ######/  / #### / / #### /  ",
-    "     ###       ###    ##   #####      ###/     ###/   ",
-    "                     /                                ",
-    "                    /                                 "
-};
 
 #endif
 

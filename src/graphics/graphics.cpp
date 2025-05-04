@@ -1,10 +1,8 @@
 #include "graphics.h"
 
-int highlighted_square = -1;
-
-void set_highlighted_square(int square){
-    highlighted_square = square;
-}
+/*
+    Initializes ncurses and all the windows
+*/
 
 void init_graphics(){
     initscr();
@@ -14,15 +12,31 @@ void init_graphics(){
     init_colors();
     keypad(stdscr, 1);
     mousemask(ALL_MOUSE_EVENTS, NULL);
+    curs_set(0); //sets cursor invisible
     refresh();
     init_board_win();
     init_move_history();
     init_buttons();
-    draw_board();
-    draw_buttons();
+    init_menu_options();
+    //draw_board();
+    //draw_buttons();
 }
 
-void start_game_loop(){
+/*
+    The core analysis loop, handling user input for the board and window
+    Loop for analysis mode
+*/
+
+void start_analysis_loop(){
+    //no need for timer support
+    nodelay(stdscr, FALSE);
+
+    //Reset the board at the start of the game loop to the original position
+    reset_move_history();
+    reset_board_win();
+    draw_all();
+    draw_analysis_buttons();
+    draw_all();
     MEVENT event;
     int c;
     while (1) {
@@ -52,25 +66,42 @@ void start_game_loop(){
     endwin();
 }
 
+void start_game_loop(){
+    //
+    
+    //Reset the board at the start of the game loop to the original position
+    reset_move_history();
+    reset_board_win();
+
+    //draw_all();
+    draw_local_buttons();
+    draw_all();
+    MEVENT event;
+    int c;
+    while (1) {
+        c = getch();
+        if (c == KEY_MOUSE) {
+            if (getmouse(&event) == OK) {
+                if (event.bstate & BUTTON1_CLICKED) {
+                    if(point_in_window(get_board_win(), event.x, event.y)){
+                        board_receive_input(cursor_to_window_x(event.x), cursor_to_window_y(event.y));
+                    }else{
+                        button_receive_input_game(event.x, event.y);
+                    }
+                }
+            }
+            draw_all();
+        }
+    }
+    endwin();
+}
+
+
 void draw_all(){
     draw_board();
     draw_move_history();
 }
 
-static const char splash_message[] = ">Press Any Key to Continue<";
-
-void draw_splash_screen(WINDOW * win){
-    for(int i = 0; i < splash_screen_art_length; i++){
-        mvwprintw(win, i, splash_screen_hpad, "%s", splash_screen_art[i]);
-    }
-    struct timespec remaining, request = {0, 50000000L}; ;
-    wmove(win, 20, splash_screen_hpad + 14);
-    for(int i = 0; i < 27; i++){
-        nanosleep(&request, &remaining);
-        waddch(win, splash_message[i]);
-        wrefresh(win);
-    }
-}
 
 bool point_in_window(WINDOW *win, int px, int py){
     int beg_x, beg_y;

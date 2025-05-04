@@ -2,12 +2,18 @@
 #include "../engine/engine.h" //only for debugging last search score
 #include <stdlib.h>
 
+/*
+    Buttons are only drawn once at the start of the loop since they never need to be redrawn
+    Buttons has an associated ID with arrays that stores information about each button
+    Buttons always do a void and no parameter function when clicked
+*/
+
 const int num_buttons = 6;
 WINDOW *buttons[num_buttons];
 void (*button_funcs[num_buttons]) (void);
-const int UNDO_BUTTON = 0, REDO_BUTTON = 1, EXIT_BUTTON = 2, FEN_BUTTON = 3, PGN_BUTTON = 4, ENGINE_BUTTON = 5;
-const char button_labels[num_buttons][30] = {"UNDO MOVE", "REDO MOVE", "QUIT", "ENTER FEN", "ENTER PGN", "ENGINE"};
-const int x_padding[num_buttons] = {5, 5, 3, 3, 3, 3};
+const int UNDO_BUTTON = 1, REDO_BUTTON = 2, EXIT_BUTTON = 0, FEN_BUTTON = 3, PGN_BUTTON = 4, ENGINE_BUTTON = 5;
+const char button_labels[num_buttons][30] = {"BACK", "UNDO MOVE", "REDO MOVE", "ENTER FEN", "ENTER PGN", "ENGINE"};
+const int x_padding[num_buttons] = {3, 5, 5, 3, 3, 3};
 
 const int SMALL_BUTTON_WIDTH = 19, SMALL_BUTTON_HEIGHT = 3;
 const int BIG_BUTTON_WIDTH = 15;
@@ -39,7 +45,7 @@ void init_buttons(){
     button_funcs[ENGINE_BUTTON] = click_engine;
 }
 
-void draw_buttons(){
+void draw_analysis_buttons(){
     for(int i = 0; i < num_buttons; i++){
         mvwprintw(buttons[i], 1, x_padding[i], button_labels[i]);
         box(buttons[i], 0, 0);
@@ -48,12 +54,27 @@ void draw_buttons(){
     refresh();
 }
 
+void draw_local_buttons(){
+    mvwprintw(buttons[EXIT_BUTTON], 1, x_padding[EXIT_BUTTON], button_labels[EXIT_BUTTON]);
+    box(buttons[EXIT_BUTTON], 0, 0);
+    wrefresh(buttons[EXIT_BUTTON]);
+}
+
+
+
 void button_receive_input(int cursor_x, int cursor_y){
     for(int i = 0; i < num_buttons; i++){
         if(point_in_window(buttons[i], cursor_x, cursor_y)){
             (*button_funcs[i]) ();
         }
     }
+}
+
+void button_receive_input_game(int cursor_x, int cursor_y){
+    if(point_in_window(buttons[EXIT_BUTTON], cursor_x, cursor_y)){
+        (*button_funcs[EXIT_BUTTON]) ();
+    }
+    
 }
 
 void click_undo(){
@@ -69,8 +90,8 @@ void click_redo(){
 }
 
 void click_exit(){
-    endwin();
-    exit(0);
+    erase();
+    start_menu_loop();
 }
 
 void click_fen(){
@@ -97,6 +118,11 @@ const char square[64][3] = {
     "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8",
 };
 
+/*
+    Runs the engine then plays the engine move
+    also displays the evaluation on the bottom left
+*/
+
 void click_engine(){
     uint16_t move = get_engine_move();
     int source = (move >> 10) & 0x3f;
@@ -106,6 +132,11 @@ void click_engine(){
     official_make_move(move);
 }
 
+/*
+    Leaves curses mode and prompts the user with message
+    The entered string is then stored in char *str
+    does not check whether the input is valid or not
+*/
 void exit_curses_get_input(char *str, char *message, int lim){
     def_prog_mode();
 	endwin();

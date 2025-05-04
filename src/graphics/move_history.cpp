@@ -21,9 +21,6 @@ void init_move_history(){
     history_size = 0;
     cur_move_ind = 0;
     history_window = newwin(HEIGHT, WIDTH, VPAD, HPAD);
-    box(history_window, 0, 0);
-    wrefresh(history_window);
-    refresh();
 }
 
 void reset_move_history(){

@@ -4,9 +4,9 @@
 
 
 int main() {
-    init_graphics();
-    start_game_loop();
-    
+    //init_graphics();
+    //start_game_loop();
+    start();
     /*
     init_magics();
     Engine engine;
