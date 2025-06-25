@@ -18,6 +18,7 @@ void init_graphics(){
     init_move_history();
     init_buttons();
     init_menu_options();
+    initialize_timer();
     //draw_board();
     //draw_buttons();
 }
@@ -66,9 +67,21 @@ void start_analysis_loop(){
     endwin();
 }
 
+int kbhit(void)
+{
+    int ch = getch();
+
+    if (ch != ERR) {
+        ungetch(ch);
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
 void start_game_loop(){
-    //
-    
+    //need a timer
+    nodelay(stdscr, TRUE);
     //Reset the board at the start of the game loop to the original position
     reset_move_history();
     reset_board_win();
@@ -78,20 +91,27 @@ void start_game_loop(){
     draw_all();
     MEVENT event;
     int c;
+    start_timer();
     while (1) {
-        c = getch();
-        if (c == KEY_MOUSE) {
-            if (getmouse(&event) == OK) {
-                if (event.bstate & BUTTON1_CLICKED) {
-                    if(point_in_window(get_board_win(), event.x, event.y)){
-                        board_receive_input(cursor_to_window_x(event.x), cursor_to_window_y(event.y));
-                    }else{
-                        button_receive_input_game(event.x, event.y);
+        if(kbhit()){
+            c = getch();
+            if (c == KEY_MOUSE) {
+                if (getmouse(&event) == OK) {
+                    if (event.bstate & BUTTON1_CLICKED) {
+                        if(point_in_window(get_board_win(), event.x, event.y)){
+                            board_receive_input(cursor_to_window_x(event.x), cursor_to_window_y(event.y));
+                        }else{
+                            button_receive_input_game(event.x, event.y);
+                        }
                     }
                 }
+                draw_all();
             }
-            draw_all();
+        }else{
+            struct timespec remaining, request = {0, 5000L};
+            nanosleep(&request, &remaining);
         }
+        update_timer();
     }
     endwin();
 }

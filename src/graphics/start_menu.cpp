@@ -42,7 +42,7 @@ void draw_splash_screen(){
     for(int i = 0; i < 17; i++){
         mvprintw(i + 2, splash_screen_hpad, "%s", splash_screen_art[i]);
     }
-    struct timespec remaining, request = {0, 50000000L}; ;
+    struct timespec remaining, request = {0, 50000000L};
     move(20, splash_screen_hpad + 14);
     for(int i = 0; i < 27; i++){
         nanosleep(&request, &remaining);

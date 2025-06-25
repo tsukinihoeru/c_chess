@@ -24,6 +24,13 @@ extern const int MAX_PGN_LENGTH;
 void start();
 void start_menu_loop();
 
+//timer.cpp
+//later used to set up time control settings from menu selection
+void draw_timer_windows();
+void update_timer();
+void initialize_timer();
+void start_timer();
+
 //graphics.c functions
 void init_graphics();
 void init_colors();
@@ -49,6 +56,7 @@ void draw_board();
 bool square_highlighted(int square);
 uint16_t get_engine_move();
 void official_make_move(uint16_t move);
+int board_get_side_to_move();
 
 //move_history functions
 void draw_move_history();

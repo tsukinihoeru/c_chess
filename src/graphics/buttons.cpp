@@ -20,7 +20,7 @@ const int BIG_BUTTON_WIDTH = 15;
 const int UNDO_X = 100, UNDO_Y = 41;
 const int REDO_X = 131, REDO_Y = 41;
 const int EXIT_WIDTH = 10, EXIT_HEIGHT = 3;
-const int EXIT_X = 100, EXIT_Y = 44;
+const int EXIT_X = 130, EXIT_Y = 47;
 const int FEN_X = 110, FEN_Y = 44;
 const int PGN_X = 125, PGN_Y = 44;
 const int ENG_X = 100, ENG_Y = 47;

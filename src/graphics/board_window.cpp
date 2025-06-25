@@ -203,3 +203,8 @@ bool check_move_invalid(Board * board, uint16_t move){
 uint16_t get_engine_move(){
     return window_engine.iterative_deepening(7);
 }
+
+//white = 0, black = 1
+int board_get_side_to_move(){
+    return board.side_to_move;
+}
